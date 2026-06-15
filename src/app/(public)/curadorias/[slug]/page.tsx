@@ -8,11 +8,9 @@ interface Props {
 }
 
 const typeLabels: Record<string, string> = {
-  short_film: "Curta-metragem",
-  feature_film: "Longa-metragem",
+  short: "Curta-metragem",
   documentary: "Documentário",
   animation: "Animação",
-  series: "Série",
 };
 
 export default async function CuradoriaDetailPage({ params }: Props) {

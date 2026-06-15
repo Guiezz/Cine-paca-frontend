@@ -9,23 +9,22 @@ interface Props {
 
 const filterOptions = [
   { label: "Todas as listas", value: "" },
-  { label: "Anos iniciais", value: "anos_iniciais" },
-  { label: "Anos finais", value: "anos_finais" },
-  { label: "Ensino médio", value: "ensino_medio" },
-  { label: "Aula de abertura", value: "abertura" },
+  { label: "Anos iniciais", value: "Anos iniciais" },
+  { label: "Anos finais", value: "Anos finais" },
+  { label: "Ensino Fundamental", value: "Ensino Fundamental" },
+  { label: "Educação Infantil", value: "Educação Infantil" },
+  { label: "Ensino médio", value: "Ensino médio" },
 ];
 
 export default async function CuradoriasPage({ searchParams }: Props) {
   const params = await searchParams;
-  const stage = params.stage;
+  const stageFilter = params.stage;
 
-  const apiParams: Record<string, string | number | boolean | undefined> = {
-    per_page: 50,
-  };
-  if (stage) apiParams.stage = stage;
-
-  const result = await listsService.listPublic(apiParams);
-  const lists = result.ok ? result.data.data : [];
+  const result = await listsService.listPublic({ per_page: 50 });
+  const allLists = result.ok ? result.data.data : [];
+  const lists = stageFilter
+    ? allLists.filter((list) => list.stage === stageFilter)
+    : allLists;
 
   const featured = lists[0];
   const remaining = lists.slice(1);
@@ -59,7 +58,7 @@ export default async function CuradoriasPage({ searchParams }: Props) {
         <div className="flex items-center gap-2.5 flex-wrap">
           {filterOptions.map((filter) => {
             const isActive =
-              filter.value === "" ? !stage : stage === filter.value;
+              filter.value === "" ? !stageFilter : stageFilter === filter.value;
             return (
               <Link
                 key={filter.value}

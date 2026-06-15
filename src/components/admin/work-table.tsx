@@ -4,11 +4,9 @@ import type { WorkEntity } from "@/types/api";
 import { StatusBadge } from "@/components/admin/status-badge";
 
 const typeLabels: Record<string, string> = {
-  short_film: "Curta",
-  feature_film: "Longa",
+  short: "Curta",
   documentary: "Documentário",
   animation: "Animação",
-  series: "Série",
 };
 
 function ratingLabel(rating: string) {

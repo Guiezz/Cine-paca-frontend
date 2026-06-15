@@ -85,21 +85,26 @@ export default async function HomePage() {
           FILTROS DE AULA
         </span>
         <div className="flex items-center gap-2.5">
-          {["Tudo do acervo", "Anos iniciais", "Anos finais", "Ensino médio", "Habilidades BNCC", "Curta-metragem", "Documentário"].map(
-            (filter, i) => (
-              <Link
-                key={filter}
-                href={i === 0 ? "/obras" : `/obras?stage=${filter.toLowerCase().replace(/\s+/g, "_")}`}
-                className={`flex min-h-[38px] items-center rounded-full px-3.5 text-sm font-[560] transition-colors ${
-                  i === 0
-                    ? "border border-cine-300 bg-cine-600 text-cine-50"
-                    : "border border-cine-300/40 bg-cine-800/40 text-cine-200 hover:text-cine-50"
-                }`}
-              >
-                {filter}
-              </Link>
-            ),
-          )}
+          {[
+            { label: "Tudo do acervo", href: "/obras" },
+            { label: "Anos iniciais", href: "/obras?stage=Anos+iniciais" },
+            { label: "Ensino Fundamental", href: "/obras?stage=Ensino+Fundamental" },
+            { label: "Ensino médio", href: "/obras?stage=Ensino+m%C3%A9dio" },
+            { label: "Curta-metragem", href: "/obras?type=short" },
+            { label: "Documentário", href: "/obras?type=documentary" },
+          ].map((filter, i) => (
+            <Link
+              key={filter.label}
+              href={filter.href}
+              className={`flex min-h-[38px] items-center rounded-full px-3.5 text-sm font-[560] transition-colors ${
+                i === 0
+                  ? "border border-cine-300 bg-cine-600 text-cine-50"
+                  : "border border-cine-300/40 bg-cine-800/40 text-cine-200 hover:text-cine-50"
+              }`}
+            >
+              {filter.label}
+            </Link>
+          ))}
         </div>
       </section>
 

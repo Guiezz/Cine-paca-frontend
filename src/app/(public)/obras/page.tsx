@@ -7,7 +7,7 @@ import { SearchActiveFilters } from "./search-active-filters";
 import { SearchSort } from "./search-sort";
 
 interface Props {
-  searchParams: Promise<{ q?: string; stage?: string; type?: string; pedagogical_use?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; stage?: string; type?: string; page?: string }>;
 }
 
 export default async function SearchPage({ searchParams }: Props) {
@@ -15,22 +15,19 @@ export default async function SearchPage({ searchParams }: Props) {
   const q = params.q;
   const stage = params.stage;
   const type = params.type;
-  const pedagogical_use = params.pedagogical_use;
   const page = params.page ? Number(params.page) : 1;
 
   const apiParams: Record<string, string | number | boolean | undefined> = { page };
   if (q) apiParams.q = q;
   if (stage) apiParams.stage = stage;
   if (type) apiParams.type = type;
-  if (pedagogical_use) apiParams.pedagogical_use = pedagogical_use;
 
   const result = await worksService.listPublic(apiParams);
-  const hasActiveFilters = !!(q || stage || type || pedagogical_use);
+  const hasActiveFilters = !!(q || stage || type);
 
   const buildActiveFilters = () => {
     const filters: { label: string; param: string; value: string }[] = [];
-    if (stage) filters.push({ label: "Etapa", param: "stage", value: stage === "ensino_fundamental_ii" ? "Ensino Fundamental II" : stage.replace(/_/g, " ") });
-    if (pedagogical_use) filters.push({ label: "Uso em sala", param: "pedagogical_use", value: pedagogical_use.replace(/_/g, " ") });
+    if (stage) filters.push({ label: "Etapa", param: "stage", value: stage });
     return filters;
   };
 
@@ -115,7 +112,6 @@ export default async function SearchPage({ searchParams }: Props) {
                       if (q) params.set("q", q);
                       if (stage) params.set("stage", stage);
                       if (type) params.set("type", type);
-                      if (pedagogical_use) params.set("pedagogical_use", pedagogical_use);
                       params.set("page", String(p));
 
                       return (

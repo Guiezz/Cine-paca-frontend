@@ -143,11 +143,11 @@ export interface UpdateBnccDto {
 }
 
 // ─── Works ────────────────────────────────────────────────
-export type WorkType = "short_film" | "feature_film" | "documentary" | "animation" | "series";
+export type WorkType = "short" | "documentary" | "animation";
 export type WorkStatus = "draft" | "published" | "archived";
 export type WorkVisibility = "public" | "private";
 export type Rating = "L" | "10" | "12" | "14" | "16" | "18";
-export type PedagogicalUse = "debate" | "cultural_repertoire" | "image_reading" | "practical_project" | string;
+export type PedagogicalUse = string;
 
 export interface WorkThemeSummary {
   id: string;

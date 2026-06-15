@@ -7,11 +7,9 @@ import type { WorkEntity, PaginatedResponse } from "@/types/api";
 import { Search } from "lucide-react";
 
 const typeLabels: Record<string, string> = {
-  short_film: "Curta",
-  feature_film: "Longa",
+  short: "Curta",
   documentary: "Documentário",
   animation: "Animação",
-  series: "Série",
 };
 
 interface WorkSearchProps {

@@ -15,30 +15,18 @@ const filterGroups: FilterGroup[] = [
     label: "ETAPA",
     param: "stage",
     options: [
-      { value: "ensino_fundamental_i", label: "Ensino Fundamental I" },
-      { value: "ensino_fundamental_ii", label: "Ensino Fundamental II" },
-      { value: "ensino_medio", label: "Ensino Médio" },
-      { value: "formacao_docente", label: "Formação docente" },
+      { value: "Anos iniciais", label: "Anos iniciais" },
+      { value: "Ensino Fundamental", label: "Ensino Fundamental" },
+      { value: "Educação Infantil", label: "Educação Infantil" },
     ],
   },
   {
     label: "TIPO DE OBRA",
     param: "type",
     options: [
-      { value: "short_film", label: "Curta-metragem" },
+      { value: "short", label: "Curta-metragem" },
       { value: "animation", label: "Animação" },
       { value: "documentary", label: "Documentário" },
-      { value: "feature_film", label: "Longa-metragem" },
-    ],
-  },
-  {
-    label: "USO EM SALA",
-    param: "pedagogical_use",
-    options: [
-      { value: "debate", label: "Abertura de debate" },
-      { value: "cultural_repertoire", label: "Repertório cultural" },
-      { value: "image_reading", label: "Leitura de imagem" },
-      { value: "practical_project", label: "Projeto prático" },
     ],
   },
 ];

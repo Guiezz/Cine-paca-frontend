@@ -70,7 +70,7 @@ export function ObraCard({ work, variant = "default", className }: ObraCardProps
         )}>
           {[
             work.release_year,
-            work.type === "short_film" ? "Curta" : work.type === "feature_film" ? "Longa" : "Documentário",
+            work.type === "short" ? "Curta" : work.type === "documentary" ? "Doc" : work.type === "animation" ? "Animação" : work.type,
             work.rating,
             `${work.duration_minutes} min`,
           ]

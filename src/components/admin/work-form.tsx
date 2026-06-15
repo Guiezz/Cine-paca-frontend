@@ -17,11 +17,17 @@ import {
 } from "@/components/ui/select";
 
 const workTypeLabels: Record<string, string> = {
-  short_film: "Curta-metragem",
-  feature_film: "Longa-metragem",
+  short: "Curta-metragem",
   documentary: "Documentário",
   animation: "Animação",
-  series: "Série",
+};
+
+const stageLabels: Record<string, string> = {
+  "Anos iniciais": "Anos iniciais",
+  "Anos finais": "Anos finais",
+  "Ensino Fundamental": "Ensino Fundamental",
+  "Educação Infantil": "Educação Infantil",
+  "Ensino médio": "Ensino médio",
 };
 
 const ratingLabels: Record<string, string> = {
@@ -43,7 +49,7 @@ export function WorkForm({ initial }: WorkFormProps) {
   const [error, setError] = useState<string | null>(null);
 
   const [title, setTitle] = useState(initial?.title ?? "");
-  const [type, setType] = useState(initial?.type ?? "short_film");
+  const [type, setType] = useState(initial?.type ?? "short");
   const [duration, setDuration] = useState(String(initial?.duration_minutes ?? ""));
   const [year, setYear] = useState(String(initial?.release_year ?? ""));
   const [rating, setRating] = useState(initial?.rating ?? "L");
@@ -196,7 +202,7 @@ export function WorkForm({ initial }: WorkFormProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Tipo</label>
-                  <Select value={type} onValueChange={(v) => setType(v ?? "short_film")}>
+                  <Select value={type} onValueChange={(v) => setType(v ?? "short")}>
                     <SelectTrigger className={selectClass}>
                       <SelectValue />
                     </SelectTrigger>
@@ -325,12 +331,18 @@ export function WorkForm({ initial }: WorkFormProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Etapa sugerida</label>
-                  <input
-                    value={stage}
-                    onChange={(e) => setStage(e.target.value)}
-                    placeholder="Anos iniciais"
-                    className={inputClass}
-                  />
+                  <Select value={stage} onValueChange={(v) => setStage(v ?? "")}>
+                    <SelectTrigger className={selectClass}>
+                      <SelectValue placeholder="Selecione uma etapa" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {Object.entries(stageLabels).map(([value, label]) => (
+                        <SelectItem key={value} value={value}>
+                          {label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
                   <label className={labelClass}>Habilidades BNCC</label>
