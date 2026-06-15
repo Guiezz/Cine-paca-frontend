@@ -1,26 +1,77 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-inter), sans-serif;
+  --font-heading: var(--font-sora), sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+
+  --color-cine-50: #f8f5ef;
+  --color-cine-100: #e8e0d0;
+  --color-cine-200: #c9c1d9;
+  --color-cine-300: #aa93f9;
+  --color-cine-400: #7a5af0;
+  --color-cine-500: #614c91;
+  --color-cine-600: #49366f;
+  --color-cine-700: #342180;
+  --color-cine-800: #221439;
+  --color-cine-900: #1d1130;
+  --color-cine-950: #120a22;
+
+  --color-cine-yellow: #ffb600;
+  --color-cine-yellow-light: #ffd366;
+  --color-cine-yellow-dark: #e8b430;
+
+  --color-cine-purple: #46346c;
+  --color-cine-purple-light: #aa93f9;
+  --color-cine-card: #1e1133;
+  --color-cine-card-alt: #201337;
+  --color-cine-border: rgba(80, 64, 107, 0.74);
+  --color-cine-text-dark: #181226;
+
+  --color-background: var(--color-cine-900);
+  --color-foreground: var(--color-cine-50);
+  --color-card: var(--color-cine-card);
+  --color-card-foreground: var(--color-cine-50);
+  --color-popover: var(--color-cine-card-alt);
+  --color-popover-foreground: var(--color-cine-50);
+  --color-primary: var(--color-cine-yellow);
+  --color-primary-foreground: var(--color-cine-text-dark);
+  --color-secondary: var(--color-cine-purple);
+  --color-secondary-foreground: var(--color-cine-50);
+  --color-muted: var(--color-cine-600);
+  --color-muted-foreground: var(--color-cine-200);
+  --color-accent: var(--color-cine-300);
+  --color-accent-foreground: var(--color-cine-50);
+  --color-destructive: #952218;
+  --color-destructive-foreground: var(--color-cine-50);
+  --color-border: var(--color-cine-border);
+  --color-input: var(--color-cine-border);
+  --color-ring: var(--color-cine-yellow);
+  --color-sidebar: var(--color-cine-card-alt);
+  --color-sidebar-foreground: var(--color-cine-50);
+  --color-sidebar-primary: var(--color-cine-yellow);
+  --color-sidebar-primary-foreground: var(--color-cine-text-dark);
+  --color-sidebar-accent: var(--color-cine-600);
+  --color-sidebar-accent-foreground: var(--color-cine-50);
+  --color-sidebar-border: var(--color-cine-border);
+  --color-sidebar-ring: var(--color-cine-yellow);
+  --radius: 0.625rem;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
   }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  html {
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
 }

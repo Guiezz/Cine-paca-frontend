@@ -1,0 +1,9 @@
+export { worksService } from "./works";
+export { listsService } from "./lists";
+export { authService } from "./auth";
+export { themesService } from "./themes";
+export { institutionsService } from "./institutions";
+export { bnccService } from "./bncc";
+export { uploadService } from "./upload";
+export { auditService } from "./audit";
+export { healthService } from "./health";
