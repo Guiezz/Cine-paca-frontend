@@ -3,7 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { clientApi } from "@/lib/api-client";
-import type { CreateWorkDto, WorkEntity, ThemeEntity, BnccSkillEntity } from "@/types/api";
+import type {
+  CreateWorkDto,
+  WorkEntity,
+  ThemeEntity,
+  BnccSkillEntity,
+} from "@/types/api";
 import { TagInput } from "@/components/admin/tag-input";
 import { EditorialChecklist } from "@/components/admin/editorial-checklist";
 import { ImageUpload } from "@/components/admin/image-upload";
@@ -50,11 +55,13 @@ export function WorkForm({ initial }: WorkFormProps) {
 
   const [title, setTitle] = useState(initial?.title ?? "");
   const [type, setType] = useState(initial?.type ?? "short");
-  const [duration, setDuration] = useState(String(initial?.duration_minutes ?? ""));
+  const [duration, setDuration] = useState(
+    String(initial?.duration_minutes ?? ""),
+  );
   const [year, setYear] = useState(String(initial?.release_year ?? ""));
   const [rating, setRating] = useState(initial?.rating ?? "L");
 
-  const [synopsis, setSynopsis] = useState(initial?.synopsis ?? "");
+  const [shortDescription, setShortDescription] = useState(initial?.short_description ?? initial?.synopsis ?? "");
   const [stage, setStage] = useState(initial?.stage ?? "");
   const [bnccSkills, setBnccSkills] = useState<BnccSkillEntity[]>(
     initial?.bncc_skills?.map((s) => ({
@@ -66,10 +73,16 @@ export function WorkForm({ initial }: WorkFormProps) {
     })) ?? [],
   );
 
-  const [thumbnailUrl, setThumbnailUrl] = useState(initial?.thumbnail_image_url ?? "");
+  const [thumbnailUrl, setThumbnailUrl] = useState(
+    initial?.thumbnail_image_url ?? "",
+  );
   const [videoUrl, setVideoUrl] = useState(initial?.external_video_url ?? "");
-  const [pedagogicalUse, setPedagogicalUse] = useState(initial?.pedagogical_use ?? "");
-  const [triggerQuestion, setTriggerQuestion] = useState(initial?.trigger_question ?? "");
+  const [pedagogicalUse, setPedagogicalUse] = useState(
+    initial?.pedagogical_use ?? "",
+  );
+  const [triggerQuestion, setTriggerQuestion] = useState(
+    initial?.trigger_question ?? "",
+  );
 
   const [themes, setThemes] = useState<{ id: string; name: string }[]>(
     initial?.themes?.map((t) => ({ id: t.id, name: t.name })) ?? [],
@@ -101,7 +114,9 @@ export function WorkForm({ initial }: WorkFormProps) {
 
   function formatApiError(res: { error: string; details?: unknown }): string {
     let msg = res.error;
-    const details = res.details as { error?: { details?: { field: string; message: string }[] } } | undefined;
+    const details = res.details as
+      | { error?: { details?: { field: string; message: string }[] } }
+      | undefined;
     const items = details?.error?.details;
     if (items && items.length > 0) {
       msg += "\n" + items.map((d) => `• ${d.field}: ${d.message}`).join("\n");
@@ -117,8 +132,11 @@ export function WorkForm({ initial }: WorkFormProps) {
       const themeIds: string[] = [];
       for (const theme of themes) {
         if (theme.id.startsWith("new-")) {
-          const res = await clientApi.post<ThemeEntity>("/api/admin/themes", { name: theme.name });
-          if (!res.ok) throw new Error(`Erro ao criar tema "${theme.name}": ${res.error}`);
+          const res = await clientApi.post<ThemeEntity>("/api/admin/themes", {
+            name: theme.name,
+          });
+          if (!res.ok)
+            throw new Error(`Erro ao criar tema "${theme.name}": ${res.error}`);
           themeIds.push(res.data.id);
         } else {
           themeIds.push(theme.id);
@@ -131,30 +149,40 @@ export function WorkForm({ initial }: WorkFormProps) {
         duration_minutes: Number(duration),
         release_year: year ? Number(year) : undefined,
         rating: rating as CreateWorkDto["rating"],
-        synopsis,
+        short_description: shortDescription || undefined,
+        synopsis: shortDescription,
         stage: stage || undefined,
         thumbnail_image_url: thumbnailUrl || undefined,
         external_video_url: videoUrl || undefined,
         pedagogical_use: pedagogicalUse || undefined,
         trigger_question: triggerQuestion || undefined,
         theme_ids: themeIds.length > 0 ? themeIds : undefined,
-        bncc_skill_ids: bnccSkills.length > 0 ? bnccSkills.map((s) => s.id) : undefined,
+        bncc_skill_ids:
+          bnccSkills.length > 0 ? bnccSkills.map((s) => s.id) : undefined,
       };
 
       let workId = initial?.id;
 
       if (initial) {
-        const res = await clientApi.patch<WorkEntity>(`/api/admin/works/${initial.id}`, payload);
+        const res = await clientApi.patch<WorkEntity>(
+          `/api/admin/works/${initial.id}`,
+          payload,
+        );
         if (!res.ok) throw new Error(res.error ?? "Erro ao atualizar obra");
         workId = initial.id;
       } else {
-        const res = await clientApi.post<WorkEntity>("/api/admin/works", payload);
+        const res = await clientApi.post<WorkEntity>(
+          "/api/admin/works",
+          payload,
+        );
         if (!res.ok) throw new Error(res.error ?? "Erro ao criar obra");
         workId = res.data.id;
       }
 
       if (status === "published" && workId) {
-        const pubRes = await clientApi.post(`/api/admin/works/${workId}/publish`);
+        const pubRes = await clientApi.post(
+          `/api/admin/works/${workId}/publish`,
+        );
         if (!pubRes.ok) throw new Error(formatApiError(pubRes));
       }
 
@@ -202,7 +230,10 @@ export function WorkForm({ initial }: WorkFormProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Tipo</label>
-                  <Select value={type} onValueChange={(v) => setType(v ?? "short")}>
+                  <Select
+                    value={type}
+                    onValueChange={(v) => setType(v ?? "short")}
+                  >
                     <SelectTrigger className={selectClass}>
                       <SelectValue />
                     </SelectTrigger>
@@ -238,7 +269,10 @@ export function WorkForm({ initial }: WorkFormProps) {
                 </div>
                 <div>
                   <label className={labelClass}>Classificação indicativa</label>
-                  <Select value={rating} onValueChange={(v) => setRating(v ?? "L")}>
+                  <Select
+                    value={rating}
+                    onValueChange={(v) => setRating(v ?? "L")}
+                  >
                     <SelectTrigger className={selectClass}>
                       <SelectValue />
                     </SelectTrigger>
@@ -301,8 +335,8 @@ export function WorkForm({ initial }: WorkFormProps) {
               <div>
                 <label className={labelClass}>Sinopse curta</label>
                 <textarea
-                  value={synopsis}
-                  onChange={(e) => setSynopsis(e.target.value)}
+                  value={shortDescription}
+                  onChange={(e) => setShortDescription(e.target.value)}
                   placeholder="Escreva uma sinopse breve da obra..."
                   className="h-[112px] w-full resize-none rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-2 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
                 />
@@ -331,7 +365,10 @@ export function WorkForm({ initial }: WorkFormProps) {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelClass}>Etapa sugerida</label>
-                  <Select value={stage} onValueChange={(v) => setStage(v ?? "")}>
+                  <Select
+                    value={stage}
+                    onValueChange={(v) => setStage(v ?? "")}
+                  >
                     <SelectTrigger className={selectClass}>
                       <SelectValue placeholder="Selecione uma etapa" />
                     </SelectTrigger>
@@ -367,8 +404,8 @@ export function WorkForm({ initial }: WorkFormProps) {
                   />
                 </div>
                 <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
-                  Adicione quantos temas forem necessários. Ex: Emoções, Cultura brasileira,
-                  Infância, Leitura de imagem, Natureza etc.
+                  Adicione quantos temas forem necessários. Ex: Emoções, Cultura
+                  brasileira, Infância, Leitura de imagem, Natureza etc.
                 </p>
               </div>
             </div>
@@ -377,8 +414,6 @@ export function WorkForm({ initial }: WorkFormProps) {
 
         {/* Sidebar */}
         <div className="space-y-[18px]">
-          <EditorialChecklist checked={checklist} onToggle={toggleChecklist} />
-
           {/* Status do cadastro card */}
           <div className="rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6">
             <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light">
@@ -388,6 +423,8 @@ export function WorkForm({ initial }: WorkFormProps) {
               {isEditing ? "Em edição" : "Rascunho em revisão"}
             </p>
           </div>
+
+          <EditorialChecklist checked={checklist} onToggle={toggleChecklist} />
         </div>
       </div>
 

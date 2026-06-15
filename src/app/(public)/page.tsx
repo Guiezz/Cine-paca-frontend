@@ -3,7 +3,7 @@ import { worksService } from "@/lib/services";
 import { ObraCard } from "@/components/public/obra-card";
 
 export default async function HomePage() {
-  const result = await worksService.listPublic({ per_page: 4 });
+  const result = await worksService.listPublic({ per_page: 5 });
 
   const works = result.ok ? result.data.data : [];
 
@@ -88,7 +88,10 @@ export default async function HomePage() {
           {[
             { label: "Tudo do acervo", href: "/obras" },
             { label: "Anos iniciais", href: "/obras?stage=Anos+iniciais" },
-            { label: "Ensino Fundamental", href: "/obras?stage=Ensino+Fundamental" },
+            {
+              label: "Ensino Fundamental",
+              href: "/obras?stage=Ensino+Fundamental",
+            },
             { label: "Ensino médio", href: "/obras?stage=Ensino+m%C3%A9dio" },
             { label: "Curta-metragem", href: "/obras?type=short" },
             { label: "Documentário", href: "/obras?type=documentary" },
@@ -114,20 +117,20 @@ export default async function HomePage() {
         <div className="flex flex-1 flex-col gap-[18px]">
           <div className="flex items-end justify-between">
             <div>
-              <div className="flex items-center gap-2">
-                <div className="h-0.5 w-7 bg-cine-yellow" />
-              </div>
               <h2 className="font-heading text-[28px] font-bold leading-tight tracking-tight text-cine-50">
-                Obras para abrir conversa
+                Obras para abrir
+              </h2>
+              <h2 className="font-heading text-[28px] font-bold leading-tight tracking-tight text-cine-50">
+                conversa
               </h2>
             </div>
-            <p className="max-w-[460px] text-sm leading-relaxed text-cine-200">
+            <p className="max-w-[460px] pr-16 text-sm leading-relaxed text-cine-200">
               Seleção inicial com foco em cultura, imaginação, território e
               formação audiovisual, pronta para o olhar do professor.
             </p>
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-[1.18fr_1fr_1fr] grid-rows-2 gap-4">
             {featured ? (
               <ObraCard
                 work={featured}
@@ -167,10 +170,22 @@ export default async function HomePage() {
 
           <div className="flex flex-col gap-2.5 pt-5">
             {[
-              { label: "FAIXA ETÁRIA", text: "Filmes livres, 10+, 12+ e 14+ com leitura clara." },
-              { label: "ETAPA", text: "Obras para anos iniciais, finais e ensino médio com recorte pedagógico." },
-              { label: "DURAÇÃO", text: "Curtas de 5 a 15 min ideais para exibição e conversa em um período." },
-              { label: "BNCC", text: "Cada obra conectada a códigos da BNCC para planejamento alinhado à base." },
+              {
+                label: "FAIXA ETÁRIA",
+                text: "Filmes livres, 10+, 12+ e 14+ com leitura clara.",
+              },
+              {
+                label: "ETAPA",
+                text: "Obras para anos iniciais, finais e ensino médio com recorte pedagógico.",
+              },
+              {
+                label: "DURAÇÃO",
+                text: "Curtas de 5 a 15 min ideais para exibição e conversa em um período.",
+              },
+              {
+                label: "BNCC",
+                text: "Cada obra conectada a códigos da BNCC para planejamento alinhado à base.",
+              },
             ].map((item) => (
               <div
                 key={item.label}
