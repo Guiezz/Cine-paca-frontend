@@ -34,6 +34,7 @@ export function ListForm({ initial }: ListFormProps) {
   const [stage, setStage] = useState(initial?.stage ?? "");
   const [description, setDescription] = useState(initial?.description ?? "");
   const [coverImageUrl, setCoverImageUrl] = useState(initial?.cover_image_url ?? "");
+  const [adminNote, setAdminNote] = useState(initial?.admin_note ?? "");
 
   const [orderedItems, setOrderedItems] = useState<OrderedItem[]>(
     initial?.items?.map((i) => ({
@@ -124,6 +125,7 @@ export function ListForm({ initial }: ListFormProps) {
           description,
           stage: stage || undefined,
           cover_image_url: coverImageUrl || undefined,
+          admin_note: adminNote || undefined,
         });
         if (!res.ok) throw new Error(formatApiError(res));
         listId = initial.id;
@@ -133,6 +135,7 @@ export function ListForm({ initial }: ListFormProps) {
           description,
           stage: stage || undefined,
           cover_image_url: coverImageUrl || undefined,
+          admin_note: adminNote || undefined,
         });
         if (!res.ok) throw new Error(formatApiError(res));
         listId = res.data.id;
@@ -227,6 +230,16 @@ export function ListForm({ initial }: ListFormProps) {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Descreva o propósito pedagógico da lista..."
                 className="h-[116px] w-full resize-none rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+              />
+            </div>
+
+            <div>
+              <label className={labelClass}>OBSERVAÇÕES DO CURADOR</label>
+              <textarea
+                value={adminNote}
+                onChange={(e) => setAdminNote(e.target.value)}
+                placeholder="Instruções, observações e contexto para professores usarem a lista..."
+                className="h-[180px] w-full resize-none rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
               />
             </div>
 

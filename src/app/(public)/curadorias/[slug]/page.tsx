@@ -25,6 +25,11 @@ export default async function CuradoriaDetailPage({ params }: Props) {
   const list = result.data;
   const items = list.items ?? [];
 
+  const totalDuration = items.reduce(
+    (acc, item) => acc + (item.work.duration_minutes || 0),
+    0,
+  );
+
   return (
     <div className="flex w-full max-w-[1140px] flex-col items-center gap-5 mx-auto pb-14">
       {/* Breadcrumb */}
@@ -61,17 +66,17 @@ export default async function CuradoriaDetailPage({ params }: Props) {
         </p>
 
         {(list.stage ||
-          (list.themes && list.themes.length > 0) ||
-          list.estimated_duration_minutes) && (
+          totalDuration > 0 ||
+          (list.themes && list.themes.length > 0)) && (
           <div className="flex flex-wrap gap-2">
             {list.stage && (
               <span className="flex items-center rounded-full border border-cine-300/40 bg-cine-300/20 px-2.5 py-1 text-xs font-bold text-cine-50">
                 {list.stage}
               </span>
             )}
-            {list.estimated_duration_minutes && (
+            {totalDuration > 0 && (
               <span className="flex items-center rounded-full border border-cine-300/40 bg-cine-300/20 px-2.5 py-1 text-xs font-bold text-cine-50">
-                {list.estimated_duration_minutes} min
+                {totalDuration} min
               </span>
             )}
             {list.themes?.slice(0, 3).map((theme) => (
@@ -87,34 +92,20 @@ export default async function CuradoriaDetailPage({ params }: Props) {
       </section>
 
       {/* Two-Column Layout */}
-      <section className="grid w-full grid-cols-[1fr_360px] gap-7">
+      <section className="grid w-full grid-cols-[732px_1fr] gap-7">
         {/* Main Column */}
         <div className="flex flex-col gap-5">
-          {/* Admin Note / Pedagogical Context */}
-          {list.admin_note && (
-            <div className="rounded-[18px] border border-cine-border bg-cine-card-alt p-6">
-              <h2 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
-                Resumo pedagógico
-              </h2>
-              <p className="mt-2 text-sm leading-relaxed text-cine-200">
-                {list.admin_note}
-              </p>
-            </div>
-          )}
-
-          {/* Sequence of Works */}
+          {/* Sequência das obras */}
           <div className="rounded-[18px] border border-cine-border bg-cine-card-alt p-6">
-            <div className="flex items-center gap-2">
-              <div className="h-0.5 w-7 bg-cine-yellow" />
-              <span className="font-mono text-xs uppercase tracking-[0.08em] text-cine-yellow-light">
-                {items.length} {items.length === 1 ? "OBRA" : "OBRAS"} NA
-                SEQUÊNCIA
-              </span>
-            </div>
-
-            <h2 className="mt-2 font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
+            <h2 className="font-heading text-[24px] font-bold leading-tight tracking-tight text-cine-50">
               Sequência das obras
             </h2>
+
+            {items.length > 0 && (
+              <p className="mt-2 text-sm leading-relaxed text-cine-200">
+                {items.length} obras na sequência sugerida para esta curadoria.
+              </p>
+            )}
 
             {items.length > 0 ? (
               <div className="mt-4 flex flex-col gap-4">
@@ -187,11 +178,23 @@ export default async function CuradoriaDetailPage({ params }: Props) {
               </p>
             )}
           </div>
+
+          {/* Observação do curador */}
+          {list.admin_note && (
+            <div className="rounded-[18px] bg-[#F9F4EA] p-6">
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-[#260B83]">
+                OBSERVAÇÃO DO CURADOR
+              </span>
+              <p className="mt-3 text-sm font-[560] leading-relaxed text-[#181226] whitespace-pre-line">
+                {list.admin_note}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Sidebar */}
         <aside className="flex flex-col gap-5">
-          {/* Curatorial Summary */}
+          {/* Resumo da curadoria */}
           <div className="flex flex-col gap-3.5 rounded-[18px] border border-cine-300/40 bg-cine-800/40 p-5">
             <h2 className="font-heading text-[21px] font-bold leading-tight tracking-tight text-cine-50">
               Resumo da curadoria
@@ -201,9 +204,7 @@ export default async function CuradoriaDetailPage({ params }: Props) {
                 { label: "ETAPA", value: list.stage ?? "—" },
                 {
                   label: "DURAÇÃO ESTIMADA",
-                  value: list.estimated_duration_minutes
-                    ? `${list.estimated_duration_minutes} min`
-                    : "—",
+                  value: totalDuration > 0 ? `${totalDuration} min` : "—",
                 },
                 {
                   label: "OBRAS",
@@ -225,7 +226,7 @@ export default async function CuradoriaDetailPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Main Themes */}
+          {/* Temas principais */}
           {list.themes && list.themes.length > 0 && (
             <div className="flex flex-col gap-3.5 rounded-[18px] border border-cine-border bg-cine-card-alt p-6">
               <h2 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
