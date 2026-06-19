@@ -46,7 +46,14 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **work-form.tsx**: type/stage use `<Select>` dropdowns; short_description + synopsis sent as same value; cover image upload
 - **list-form.tsx**: cover_image_url upload field; `admin_note` textarea (only free-text field in lists API)
 
-## Current State
+## Home Page Responsive Breakpoints
+- **Mobile (<768px)**: hero text scales (3xl → 5xl → 68px), filter pills overflow-x-auto, grid is single column, sidebar stacks below, header shows hamburger menu
+- **Desktop (≥768px)**: hero full size, pills inline, 3-column grid (1.18fr 1fr 1fr), sidebar at 292px
+- **Grid classes**: `grid-cols-1 md:grid-cols-[1.18fr_1fr_1fr] md:grid-rows-2`, featured card uses `md:col-span-1 md:row-span-2`
+- **Layout padding**: `<main>` has `px-5 lg:px-0` (public layout); sections have responsive padding
+- **Header**: `relative` with hamburger button (`flex md:hidden`); dropdown menu absolute below; nav hidden on mobile
+- Logo scales: `36x44` → `56x69`, text `text-sm` → `text-lg`
+- Filter pills section: `flex-col md:flex-row`, pills container `overflow-x-auto`
 - Public home page, obras list + detail, curadorias list + detail all functional
 - Admin CRUD for works, lists, themes, BNCC skills functional
 - Filter values aligned with backend API display strings
