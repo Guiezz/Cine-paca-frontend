@@ -150,7 +150,7 @@ export function ObraCard({
 
         {themes}
 
-        <div className="flex items-center gap-2 pt-1">
+        <div className="flex flex-wrap items-center gap-2 pt-1">
           {work.external_video_url && (
             <Link
               href={work.external_video_url}
