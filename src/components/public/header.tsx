@@ -15,7 +15,7 @@ export function Header() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <header className="relative flex w-full max-w-[1140px] items-center justify-between py-5 md:py-7 mx-auto">
+    <header className="relative flex w-full max-w-[1140px] items-center justify-between py-5 md:py-7 mx-auto px-5 lg:px-0">
       <Link href="/" className="flex items-center gap-3 md:gap-9">
         <svg width="36" height="44" viewBox="0 0 56 69" fill="none" className="md:w-[56px] md:h-[69px]">
           <path

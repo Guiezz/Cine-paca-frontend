@@ -31,12 +31,12 @@ export default async function HomePage() {
 
           <form
             action="/obras"
-            className="flex w-full max-w-[820px] items-center gap-3 pt-4"
+            className="flex w-full items-center gap-2 md:gap-3 pt-4"
           >
-            <div className="flex flex-1 items-center gap-3 rounded-full border border-cine-50/20 bg-cine-50 px-5 py-3.5">
+            <div className="flex flex-1 items-center gap-2 md:gap-3 rounded-full border border-cine-50/20 bg-cine-50 px-4 md:px-5 py-2.5 md:py-3.5">
               <svg
-                width="22"
-                height="22"
+                width="18"
+                height="18"
                 viewBox="0 0 22 22"
                 fill="none"
                 className="shrink-0 text-cine-400"
@@ -52,16 +52,16 @@ export default async function HomePage() {
                 name="q"
                 type="text"
                 placeholder="Buscar por título, tema, BNCC ou palavra-chave"
-                className="flex-1 bg-transparent text-sm text-cine-text-dark outline-none placeholder:text-[#868390]"
+                className="flex-1 bg-transparent text-xs md:text-sm text-cine-text-dark outline-none placeholder:text-[#868390]"
               />
             </div>
             <button
               type="submit"
-              className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-cine-yellow"
+              className="flex h-12 w-12 md:h-14 md:w-14 shrink-0 items-center justify-center rounded-full bg-cine-yellow"
             >
               <svg
-                width="24"
-                height="24"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 className="text-cine-text-dark"
