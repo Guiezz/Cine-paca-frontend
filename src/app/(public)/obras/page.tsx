@@ -82,7 +82,7 @@ export default async function SearchPage({ searchParams }: Props) {
         <div className="flex flex-1 flex-col gap-[18px]">
           {result.ok && result.data.data.length > 0 ? (
             <>
-              <div className="flex items-end justify-between">
+              <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-3 md:gap-0">
                 <div>
                   <div className="flex items-center gap-2">
                     <div className="h-0.5 w-7 bg-cine-yellow" />
@@ -90,7 +90,7 @@ export default async function SearchPage({ searchParams }: Props) {
                       {result.data.pagination.total_items} RESULTADOS
                     </span>
                   </div>
-                  <h2 className="font-heading text-[28px] font-bold leading-tight tracking-tight text-cine-50">
+                  <h2 className="font-heading text-xl md:text-[28px] font-bold leading-tight tracking-tight text-cine-50">
                     Obras compatíveis
                   </h2>
                 </div>
@@ -190,7 +190,7 @@ export default async function SearchPage({ searchParams }: Props) {
 
               {/* Suggestions */}
               <div className="flex flex-col gap-4 rounded-[18px] border border-cine-border bg-cine-card-alt p-6">
-                <div className="flex items-end justify-between">
+                <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-3 md:gap-0">
                   <div>
                     <div className="flex items-center gap-2">
                       <div className="h-0.5 w-7 bg-cine-yellow" />
