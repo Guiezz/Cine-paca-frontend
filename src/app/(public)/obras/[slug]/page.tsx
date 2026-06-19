@@ -35,18 +35,18 @@ export default async function WorkDetailPage({ params }: Props) {
   return (
     <div className="flex flex-col w-full max-w-[1140px] mx-auto pb-14 gap-2">
       {/* Breadcrumb */}
-      <nav className="flex items-center gap-1 text-sm">
-        <span className="text-cine-200/80">Catálogo</span>
-        <span className="text-cine-200/80">/</span>
-        <span className="text-cine-200/80">Busca</span>
-        <span className="text-cine-200/80">/</span>
-        <span className="text-cine-50">Detalhes da obra</span>
+      <nav className="flex items-center gap-1 text-sm truncate">
+        <span className="text-cine-200/80 shrink-0">Catálogo</span>
+        <span className="text-cine-200/80 shrink-0">/</span>
+        <span className="text-cine-200/80 shrink-0">Busca</span>
+        <span className="text-cine-200/80 shrink-0">/</span>
+        <span className="text-cine-50 truncate min-w-0">Detalhes da obra</span>
       </nav>
 
       {/* Two-Column Layout */}
-      <section className="grid grid-cols-[732px_380px] gap-7 items-start">
+      <section className="grid grid-cols-1 lg:grid-cols-[732px_380px] gap-7 items-start">
         {/* Left Column */}
-        <div className="flex flex-col gap-2">
+        <div className="order-2 lg:order-1 flex flex-col gap-2">
           {/* Thumbnail */}
           <div className="flex flex-col overflow-hidden rounded-[22px] border border-cine-border bg-cine-card shadow-[0_28px_70px_0_rgba(0,0,0,0.28)]">
             <div className="relative flex aspect-[73/41] w-full items-center justify-center overflow-hidden bg-cine-900">
@@ -55,7 +55,7 @@ export default async function WorkDetailPage({ params }: Props) {
                   src={work.hero_image_url ?? work.thumbnail_image_url!}
                   alt={work.title}
                   fill
-                  sizes="732px"
+                  sizes="(max-width: 1024px) 100vw, 732px"
                   className="object-cover"
                 />
               ) : (
@@ -68,7 +68,7 @@ export default async function WorkDetailPage({ params }: Props) {
                   href={work.external_video_url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="absolute left-1/2 top-1/2 flex h-[74px] w-[74px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-cine-yellow"
+                  className="absolute left-1/2 top-1/2 flex h-14 w-14 md:h-[74px] md:w-[74px] -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-cine-yellow"
                 >
                   <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
                     <path d="M10 6.25V23.75L23.75 15L10 6.25Z" fill="#181226" />
@@ -88,11 +88,11 @@ export default async function WorkDetailPage({ params }: Props) {
           </div>
 
           {/* Ficha Técnica */}
-          <div className="rounded-[18px] border border-cine-border bg-cine-card-alt p-6">
+          <div className="rounded-[18px] border border-cine-border bg-cine-card-alt p-4 md:p-6">
             <h2 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
               Ficha técnica e curatorial
             </h2>
-            <div className="mt-4 grid grid-cols-2 gap-3">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3">
               {metadata.map((item) => (
                 <div
                   key={item.label}
@@ -110,7 +110,7 @@ export default async function WorkDetailPage({ params }: Props) {
           </div>
 
           {/* Uso em Sala */}
-          <div className="rounded-[18px] border border-cine-border bg-cine-card-alt p-6">
+          <div className="rounded-[18px] border border-cine-border bg-cine-card-alt p-4 md:p-6">
             <h2 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
               Uso em sala
             </h2>
@@ -141,9 +141,9 @@ export default async function WorkDetailPage({ params }: Props) {
         </div>
 
         {/* Right Column */}
-        <div className="flex flex-col gap-2">
+        <div className="order-1 lg:order-2 flex flex-col gap-2">
           {/* Detail Aside */}
-          <div className="flex flex-col gap-3 rounded-[22px] border border-cine-border bg-[radial-gradient(103.85%_176.36%_at_88%_10%,rgba(255,182,0,0.14)_0%,rgba(255,182,0,0)_13.23%),_#221439] px-7 py-9">
+          <div className="flex flex-col gap-3 rounded-[22px] border border-cine-border bg-[radial-gradient(103.85%_176.36%_at_88%_10%,rgba(255,182,0,0.14)_0%,rgba(255,182,0,0)_13.23%),_#221439] px-5 py-7 md:px-7 md:py-9">
             <div className="flex items-center gap-2">
               <div className="h-0.5 w-7 bg-cine-yellow" />
               <span className="font-mono text-xs uppercase tracking-[0.08em] text-cine-yellow-light">
@@ -151,7 +151,7 @@ export default async function WorkDetailPage({ params }: Props) {
               </span>
             </div>
 
-            <h1 className="font-heading text-[58px] font-bold leading-[1.03] tracking-tight text-cine-50">
+            <h1 className="font-heading text-3xl md:text-4xl lg:text-[58px] font-bold leading-[1.03] tracking-tight text-cine-50">
               {work.title}
             </h1>
 
@@ -255,7 +255,7 @@ export default async function WorkDetailPage({ params }: Props) {
           </div>
 
           {/* Obras Relacionadas */}
-          <div className="flex flex-col gap-3.5 rounded-[18px] border border-cine-border bg-cine-card-alt p-6">
+          <div className="flex flex-col gap-3.5 rounded-[18px] border border-cine-border bg-cine-card-alt p-4 md:p-6">
             <h2 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
               Obras relacionadas
             </h2>
