@@ -160,19 +160,6 @@ Tema Tailwind customizado com a paleta `cine-*`:
 - **Corpo:** Inter
 - **UI/Mono:** JetBrains Mono (labels, badges, tags)
 
-### Home Page Layout
-
-```
-┌─────────────────────────────┬──────────┐
-│  Obras para abrir conversa  │  Sidebar │
-│  ┌──────────┬──────┬──────┐ │  292px   │
-│  │ Featured │ C1R1 │ C2R1 │ │          │
-│  │ (1.18fr) ├──────┼──────┤ │          │
-│  │          │ C1R2 │ C2R2 │ │          │
-│  └──────────┴──────┴──────┘ │          │
-└─────────────────────────────┴──────────┘
-```
-
 ### ObraCard Variants
 
 | Variant | Descrição |
@@ -250,11 +237,3 @@ src/
 ```
 
 ---
-
-## Known Issues
-
-- `cdpn.cinepaca.example` não resolve — causa erro 500 no Image Optimization
-  para obras com esse domínio em `thumbnail_image_url`
-- `pedagogical_use` como filtro não funciona — backend não tem suporte
-- Seção "Preparação da aula" (ANTES/DURANTE/DEPOIS) no detalhe da curadoria
-  depende de um segundo campo na API — atualmente só `admin_note` existe
