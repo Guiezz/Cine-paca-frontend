@@ -51,7 +51,7 @@ export function SearchFilters() {
   );
 
   return (
-    <aside className="flex flex-col self-start rounded-[18px] border border-cine-border bg-cine-card-alt p-5 w-[270px]">
+    <aside className="flex flex-col self-start rounded-[18px] border border-cine-border bg-cine-card-alt p-5 w-full md:w-[270px]">
       <h2 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
         Refinar por aula
       </h2>

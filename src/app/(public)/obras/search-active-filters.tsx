@@ -31,12 +31,12 @@ export function SearchActiveFilters({
   if (!hasActiveFilters) return null;
 
   return (
-    <section className="flex w-full items-center gap-5 rounded-[18px] border border-cine-border bg-[rgba(42,26,69,0.82)] px-4 py-4">
+    <section className="flex w-full flex-wrap items-center gap-3 md:gap-5 rounded-[18px] border border-cine-border bg-[rgba(42,26,69,0.82)] px-4 py-4">
       <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-cine-yellow-light whitespace-nowrap">
         FILTROS ATIVOS
       </span>
 
-      <div className="flex items-center gap-2.5">
+      <div className="flex flex-wrap items-center gap-2.5">
         {filters.map((filter) => (
           <div
             key={filter.param}
@@ -67,7 +67,7 @@ export function SearchActiveFilters({
 
       <button
         onClick={clearAll}
-        className="ml-auto whitespace-nowrap text-sm font-bold text-cine-yellow-light hover:underline"
+        className="md:ml-auto whitespace-nowrap text-sm font-bold text-cine-yellow-light hover:underline"
       >
         Limpar filtros
       </button>

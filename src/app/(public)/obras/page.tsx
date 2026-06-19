@@ -34,7 +34,7 @@ export default async function SearchPage({ searchParams }: Props) {
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-[1140px] mx-auto pb-14">
       {/* Hero / Search Section */}
-      <section className="flex w-full flex-col gap-4 overflow-hidden rounded-[22px] border border-cine-border bg-gradient-to-br from-[#24163D] via-[#291356] to-[#1E004E] px-8 py-10">
+      <section className="flex w-full flex-col gap-4 overflow-hidden rounded-[22px] border border-cine-border bg-gradient-to-br from-[#24163D] via-[#291356] to-[#1E004E] px-5 py-8 md:px-8 md:py-10">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <div className="h-0.5 w-7 bg-cine-yellow" />
@@ -44,11 +44,11 @@ export default async function SearchPage({ searchParams }: Props) {
           </div>
 
           {result.ok && result.data.data.length > 0 ? (
-            <h1 className="font-heading text-[54px] font-bold leading-[1.03] tracking-tight text-cine-50 max-w-[720px]">
+            <h1 className="font-heading text-3xl md:text-4xl lg:text-[54px] font-bold leading-[1.03] tracking-tight text-cine-50 max-w-[720px]">
               {q ? `Resultados para "${q}"` : "Catálogo completo"}
             </h1>
           ) : (
-            <h1 className="font-heading text-[54px] font-bold leading-[1.03] tracking-tight text-cine-50 max-w-[720px]">
+            <h1 className="font-heading text-3xl md:text-4xl lg:text-[54px] font-bold leading-[1.03] tracking-tight text-cine-50 max-w-[720px]">
               Nenhuma obra encontrada
             </h1>
           )}
@@ -74,7 +74,7 @@ export default async function SearchPage({ searchParams }: Props) {
       <SearchActiveFilters hasActiveFilters={hasActiveFilters} filters={buildActiveFilters()} />
 
       {/* Main Content */}
-      <section className="flex w-full gap-7">
+      <section className="flex flex-col md:flex-row w-full gap-7">
         {/* Sidebar Filters */}
         <SearchFilters />
 
@@ -97,7 +97,7 @@ export default async function SearchPage({ searchParams }: Props) {
                 <SearchSort />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {result.data.data.map((work) => (
                   <ObraCard key={work.id} work={work} variant="default" />
                 ))}
@@ -135,8 +135,8 @@ export default async function SearchPage({ searchParams }: Props) {
           ) : (
             <>
               {/* Empty State */}
-              <div className="flex flex-col gap-6 overflow-hidden rounded-[18px] border border-cine-border bg-cine-card-alt p-8">
-                <div className="flex gap-7">
+              <div className="flex flex-col gap-6 overflow-hidden rounded-[18px] border border-cine-border bg-cine-card-alt p-6 md:p-8">
+                <div className="flex flex-col md:flex-row gap-7">
                   <div className="flex flex-1 flex-col gap-4">
                     <div className="flex items-center gap-2">
                       <div className="h-0.5 w-7 bg-cine-yellow" />
@@ -144,7 +144,7 @@ export default async function SearchPage({ searchParams }: Props) {
                         SEM RESULTADO DIRETO
                       </span>
                     </div>
-                    <h2 className="font-heading text-[46px] font-bold leading-[1.04] tracking-tight text-cine-50 max-w-[620px]">
+                    <h2 className="font-heading text-3xl md:text-[46px] font-bold leading-[1.04] tracking-tight text-cine-50 max-w-[620px]">
                       Esse termo não apareceu no acervo curado.
                     </h2>
                     <p className="max-w-[620px] text-sm leading-relaxed text-cine-200">
@@ -168,7 +168,7 @@ export default async function SearchPage({ searchParams }: Props) {
                     </div>
                   </div>
 
-                  <div className="flex aspect-square w-[220px] shrink-0 items-center justify-center rounded-[28px] border border-cine-300/50 bg-gradient-to-br from-[#614C91] to-cine-900">
+                  <div className="hidden md:flex aspect-square w-[220px] shrink-0 items-center justify-center rounded-[28px] border border-cine-300/50 bg-gradient-to-br from-[#614C91] to-cine-900">
                     <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
                       <path
                         d="M28.8 19.2H67.2C74.2645 19.2 80 24.9354 80 32V56C80 63.0645 74.2645 68.8 67.2 68.8H28.8C21.7355 68.8 16 63.0645 16 56V32C16 24.9354 21.7355 19.2 28.8 19.2Z"
@@ -207,7 +207,7 @@ export default async function SearchPage({ searchParams }: Props) {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-3 gap-3.5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
                   {Array.from({ length: 3 }).map((_, i) => (
                     <div
                       key={i}
