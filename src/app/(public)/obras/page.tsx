@@ -65,7 +65,7 @@ export default async function SearchPage({ searchParams }: Props) {
           </p>
         )}
 
-        <div className="w-full max-w-[820px]">
+        <div className="w-full">
           <SearchForm initialQuery={q ?? ""} />
         </div>
       </section>
