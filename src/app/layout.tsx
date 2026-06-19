@@ -24,6 +24,9 @@ export const metadata: Metadata = {
   title: "Cine Paca — Cinemateca Educacional",
   description:
     "Encontre curtas, longas e documentários com leitura pedagógica, indicação de faixa etária, BNCC e classificação indicativa para planejar aulas com segurança.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
