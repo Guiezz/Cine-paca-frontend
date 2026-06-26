@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 const navItems = [
   { href: "/", label: "Início" },
@@ -13,6 +13,36 @@ const navItems = [
 export function Header() {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  const closeMenu = useCallback(() => setMenuOpen(false), []);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent | TouchEvent) {
+      if (
+        menuOpen &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(e.target as Node)
+      ) {
+        closeMenu();
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("touchstart", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("touchstart", handleClickOutside);
+    };
+  }, [menuOpen, closeMenu]);
+
+  useEffect(() => {
+    closeMenu();
+  }, [pathname, closeMenu]);
 
   return (
     <header className="relative flex w-full max-w-[1140px] items-center justify-between py-5 md:py-7 mx-auto px-5 lg:px-0">
@@ -43,9 +73,12 @@ export function Header() {
       </Link>
 
       <button
+        ref={buttonRef}
+        type="button"
         className="flex md:hidden items-center justify-center size-10 rounded-full border border-[rgba(80,64,107,0.68)] bg-[rgba(42,26,69,0.72)]"
-        onClick={() => setMenuOpen(!menuOpen)}
-        aria-label="Menu"
+        onClick={() => setMenuOpen((prev) => !prev)}
+        aria-label={menuOpen ? "Fechar menu" : "Abrir menu"}
+        aria-expanded={menuOpen}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" className="text-cine-200">
           {menuOpen ? (
@@ -76,14 +109,17 @@ export function Header() {
       </nav>
 
       {menuOpen && (
-        <div className="absolute top-full left-0 right-0 z-50 mt-2 mx-5 flex flex-col gap-1 rounded-2xl border border-[rgba(80,64,107,0.68)] bg-cine-card-alt p-3 shadow-xl md:hidden">
+        <div
+          ref={dropdownRef}
+          className="absolute top-full left-0 right-0 z-50 mt-2 mx-5 flex flex-col gap-1 rounded-2xl border border-[rgba(80,64,107,0.68)] bg-cine-card-alt p-3 shadow-xl md:hidden"
+        >
           {navItems.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
                 key={item.href}
                 href={item.href}
-                onClick={() => setMenuOpen(false)}
+                onClick={closeMenu}
                 className={`flex min-h-[44px] items-center rounded-xl px-4 text-sm font-[550] transition-colors ${
                   isActive
                     ? "bg-cine-purple text-cine-50"

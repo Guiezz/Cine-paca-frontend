@@ -32,7 +32,7 @@ export default async function CuradoriasPage({ searchParams }: Props) {
   return (
     <div className="flex w-full max-w-[1140px] flex-col items-center gap-6 mx-auto pb-14">
       {/* Hero */}
-      <section className="flex w-full flex-col gap-4 overflow-hidden rounded-[22px] border border-cine-border bg-gradient-to-br from-[#24163D] via-[#291356] to-[#1E004E] px-10 py-14">
+      <section className="flex w-full flex-col gap-4 overflow-hidden rounded-[22px] border border-cine-border bg-gradient-to-br from-[#24163D] via-[#291356] to-[#1E004E] px-5 py-8 md:px-10 md:py-14">
         <div className="flex items-center gap-2">
           <div className="h-0.5 w-7 bg-cine-yellow" />
           <span className="font-mono text-xs uppercase tracking-[0.08em] text-cine-yellow-light">
@@ -40,7 +40,7 @@ export default async function CuradoriasPage({ searchParams }: Props) {
           </span>
         </div>
 
-        <h1 className="font-heading text-[68px] font-bold leading-[1.02] tracking-tight text-cine-50 max-w-[760px]">
+        <h1 className="font-heading text-3xl md:text-5xl lg:text-[68px] font-bold leading-[1.02] tracking-tight text-cine-50 max-w-[760px]">
           Listas curatoriais para planejas com cinema brasileiro.
         </h1>
 
@@ -87,7 +87,7 @@ export default async function CuradoriasPage({ searchParams }: Props) {
 
           {/* Remaining Lists Grid */}
           {remaining.length > 0 && (
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {remaining.map((list) => (
                 <ListCard key={list.id} list={list} />
               ))}

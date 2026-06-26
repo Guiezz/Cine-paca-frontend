@@ -14,7 +14,7 @@ export function FeaturedListCard({ list }: FeaturedListCardProps) {
   const count = list.items?.length ?? 0;
 
   return (
-    <section className="grid w-full grid-cols-[1fr_1fr] overflow-hidden rounded-[22px] border border-cine-border bg-cine-card">
+    <section className="grid w-full grid-cols-1 md:grid-cols-[1fr_1fr] overflow-hidden rounded-[22px] border border-cine-border bg-cine-card">
       {/* Mosaic */}
       <div className="relative grid min-h-[320px] grid-cols-2 overflow-hidden">
         {displayThumbnails.length > 0 ? (
@@ -47,7 +47,7 @@ export function FeaturedListCard({ list }: FeaturedListCardProps) {
       </div>
 
       {/* Content */}
-      <div className="flex flex-col justify-center gap-4 px-8 py-10">
+      <div className="flex flex-col justify-center gap-4 px-5 py-8 md:px-8 md:py-10">
         <div className="flex items-center gap-2">
           <div className="h-0.5 w-7 bg-cine-yellow" />
           <span className="font-mono text-xs uppercase tracking-[0.08em] text-cine-yellow-light">
@@ -55,7 +55,7 @@ export function FeaturedListCard({ list }: FeaturedListCardProps) {
           </span>
         </div>
 
-        <h2 className="font-heading text-[34px] font-bold leading-[1.1] tracking-tight text-cine-50">
+        <h2 className="font-heading text-2xl md:text-[34px] font-bold leading-[1.1] tracking-tight text-cine-50">
           {list.title}
         </h2>
 
