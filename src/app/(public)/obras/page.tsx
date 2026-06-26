@@ -7,7 +7,7 @@ import { SearchActiveFilters } from "./search-active-filters";
 import { SearchSort } from "./search-sort";
 
 interface Props {
-  searchParams: Promise<{ q?: string; stage?: string; type?: string; page?: string }>;
+  searchParams: Promise<{ q?: string; stage?: string; type?: string; page?: string; sort?: string }>;
 }
 
 export default async function SearchPage({ searchParams }: Props) {
@@ -16,11 +16,13 @@ export default async function SearchPage({ searchParams }: Props) {
   const stage = params.stage;
   const type = params.type;
   const page = params.page ? Number(params.page) : 1;
+  const sort = params.sort;
 
   const apiParams: Record<string, string | number | boolean | undefined> = { page };
   if (q) apiParams.q = q;
   if (stage) apiParams.stage = stage;
   if (type) apiParams.type = type;
+  if (sort) apiParams.sort = sort;
 
   const result = await worksService.listPublic(apiParams);
   const hasActiveFilters = !!(q || stage || type);
@@ -108,16 +110,17 @@ export default async function SearchPage({ searchParams }: Props) {
                 <div className="flex items-center justify-center gap-2 pt-4">
                   {Array.from({ length: result.data.pagination.total_pages }, (_, i) => i + 1).map(
                     (p) => {
-                      const params = new URLSearchParams();
-                      if (q) params.set("q", q);
-                      if (stage) params.set("stage", stage);
-                      if (type) params.set("type", type);
-                      params.set("page", String(p));
+                      const urlParams = new URLSearchParams();
+                      if (q) urlParams.set("q", q);
+                      if (stage) urlParams.set("stage", stage);
+                      if (type) urlParams.set("type", type);
+                      if (sort) urlParams.set("sort", sort);
+                      urlParams.set("page", String(p));
 
                       return (
                         <a
                           key={p}
-                          href={`/obras?${params.toString()}`}
+                          href={`/obras?${urlParams.toString()}`}
                           className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-bold transition-colors ${
                             p === page
                               ? "bg-cine-yellow text-cine-text-dark"
@@ -130,7 +133,7 @@ export default async function SearchPage({ searchParams }: Props) {
                     },
                   )}
                 </div>
-              )}
+            )}
             </>
           ) : (
             <>
