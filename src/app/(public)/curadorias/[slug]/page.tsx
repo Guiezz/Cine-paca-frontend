@@ -49,7 +49,7 @@ export default async function CuradoriaDetailPage({ params }: Props) {
       </nav>
 
       {/* Hero */}
-      <section className="flex w-full flex-col gap-4 overflow-hidden rounded-[22px] border border-cine-border bg-gradient-to-br from-[#24163D] via-[#291356] to-[#1E004E] px-10 py-14">
+      <section className="flex w-full flex-col gap-4 overflow-hidden rounded-[22px] border border-cine-border bg-gradient-to-br from-[#24163D] via-[#291356] to-[#1E004E] px-5 py-8 md:px-10 md:py-14">
         <div className="flex items-center gap-2">
           <div className="h-0.5 w-7 bg-cine-yellow" />
           <span className="font-mono text-xs uppercase tracking-[0.08em] text-cine-yellow-light">
@@ -57,7 +57,7 @@ export default async function CuradoriaDetailPage({ params }: Props) {
           </span>
         </div>
 
-        <h1 className="font-heading text-[68px] font-bold leading-[1.02] tracking-tight text-cine-50 max-w-[760px]">
+        <h1 className="font-heading text-3xl md:text-5xl lg:text-[68px] font-bold leading-[1.02] tracking-tight text-cine-50 max-w-[760px]">
           {list.title}
         </h1>
 
@@ -92,7 +92,7 @@ export default async function CuradoriaDetailPage({ params }: Props) {
       </section>
 
       {/* Two-Column Layout */}
-      <section className="grid w-full grid-cols-[732px_1fr] gap-7">
+      <section className="grid w-full grid-cols-1 lg:grid-cols-[732px_1fr] gap-7">
         {/* Main Column */}
         <div className="flex flex-col gap-5">
           {/* Sequência das obras */}
@@ -112,16 +112,16 @@ export default async function CuradoriaDetailPage({ params }: Props) {
                 {items.map((item, index) => (
                   <div
                     key={item.id}
-                    className="grid grid-cols-[178px_1fr] gap-4 rounded-2xl border border-cine-border/60 bg-cine-800/35 p-3"
+                    className="grid grid-cols-1 md:grid-cols-[178px_1fr] gap-4 rounded-2xl border border-cine-border/60 bg-cine-800/35 p-3"
                   >
                     {/* Thumbnail */}
-                    <div className="relative aspect-[178/100] w-[178px] shrink-0 overflow-hidden rounded-xl bg-cine-800">
+                    <div className="relative aspect-video md:aspect-[178/100] w-full md:w-[178px] shrink-0 overflow-hidden rounded-xl bg-cine-800">
                       {item.work.thumbnail_image_url ? (
                         <Image
                           src={item.work.thumbnail_image_url}
                           alt={item.work.title}
                           fill
-                          sizes="178px"
+                          sizes="(max-width: 768px) 100vw, 178px"
                           className="object-cover"
                         />
                       ) : (
