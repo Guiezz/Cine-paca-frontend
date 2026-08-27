@@ -35,6 +35,22 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - **Work form** sends `short_description` (the actual API field) and `synopsis` (API-required field) as the same value
 - **Descriptions**: `short_description` is null for ALL works in API — actual text is in `synopsis`. All cards/ detail pages use `short_description ?? synopsis` as fallback
 
+## SEO e metadados
+- Identidade e URL base ficam em `@/lib/site`. `getSiteUrl()` resolve em camadas:
+  `NEXT_PUBLIC_SITE_URL` > `VERCEL_PROJECT_PRODUCTION_URL` > localhost.
+  Defina `NEXT_PUBLIC_SITE_URL` quando houver domínio próprio — a variável da
+  Vercel continua trazendo o `*.vercel.app` nesse caso.
+- **Não** declare `alternates.canonical` no layout raiz: toda página que não
+  declarasse a sua herdaria `/` e apontaria a canônica para a home.
+- No layout raiz o bloco `twitter` traz só `card`; título e descrição caem no
+  `og:*` de cada página. Preencher os dois na raiz gruda o texto do site nas
+  páginas que não sobrescrevem.
+- `theme-color` vai no export `viewport`, não em `metadata` (mudou no Next 16).
+- `src/app/admin/layout.tsx` é server component só para poder declarar
+  `robots: noindex`; o shell com a sessão está em `admin-layout-shell.tsx`.
+- Ícones: `src/app/icon.svg` e `src/app/apple-icon.tsx` (convenções de arquivo
+  do Next). Não há `favicon.ico`.
+
 ## Design (Figma-based)
 - **Colors**: custom Tailwind theme (cine-50 through cine-950, cine-yellow, cine-card, cine-card-alt, cine-text-dark)
 - **Typography**: Sora for headings (`font-heading`), Inter/ JetBrains Mono for UI text

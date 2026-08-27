@@ -2,6 +2,20 @@ import Link from "next/link";
 import { listsService } from "@/lib/services";
 import { ListCard } from "@/components/public/list-card";
 import { FeaturedListCard } from "@/components/public/featured-list-card";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Curadorias",
+  description:
+    "Sequências prontas para aula: listas montadas por curadores, organizadas por tema, etapa de ensino, tempo de aula e objetivo pedagógico.",
+  alternates: { canonical: "/curadorias" },
+  openGraph: {
+    title: "Curadorias",
+    description:
+      "Sequências prontas para aula, organizadas por tema, etapa e objetivo pedagógico.",
+    url: "/curadorias",
+  },
+};
 
 interface Props {
   searchParams: Promise<{ stage?: string }>;

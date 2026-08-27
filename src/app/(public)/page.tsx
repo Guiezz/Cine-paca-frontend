@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { worksService } from "@/lib/services";
 import { ObraCard } from "@/components/public/obra-card";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 export default async function HomePage() {
   const result = await worksService.listPublic({ per_page: 5 });

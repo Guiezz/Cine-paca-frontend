@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
@@ -12,6 +13,53 @@ const typeLabels: Record<string, string> = {
   documentary: "Documentário",
   animation: "Animação",
 };
+
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const result = await listsService.getBySlug(slug);
+
+  if (!result.ok) {
+    return { title: "Curadoria não encontrada" };
+  }
+
+  const list = result.data;
+  const items = list.items ?? [];
+  const minutos = items.reduce(
+    (acc, item) => acc + (item.work.duration_minutes || 0),
+    0,
+  );
+
+  const ficha = [
+    items.length > 0 ? `${items.length} ${items.length === 1 ? "obra" : "obras"}` : null,
+    minutos > 0 ? `${minutos} min` : null,
+    list.stage,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  const resumo = (list.description ?? "").trim() || `Curadoria do Cine Paca. ${ficha}`;
+  const image = list.cover_image_url ?? items[0]?.work.thumbnail_image_url ?? undefined;
+
+  return {
+    title: list.title,
+    description: resumo.slice(0, 300),
+    alternates: { canonical: `/curadorias/${list.slug}` },
+    openGraph: {
+      type: "article",
+      title: list.title,
+      description: resumo.slice(0, 300),
+      url: `/curadorias/${list.slug}`,
+      ...(image ? { images: [{ url: image, alt: list.title }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: list.title,
+      description: resumo.slice(0, 200),
+      ...(image ? { images: [image] } : {}),
+    },
+  };
+}
 
 export default async function CuradoriaDetailPage({ params }: Props) {
   const { slug } = await params;
