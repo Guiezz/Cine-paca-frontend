@@ -12,27 +12,52 @@ interface WorkSearchProps {
   addedIds: Set<string>;
 }
 
+const PER_PAGE = 20;
+
 export function WorkSearch({ onAdd, addedIds }: WorkSearchProps) {
-  const [allWorks, setAllWorks] = useState<WorkEntity[]>([]);
+  const [works, setWorks] = useState<WorkEntity[]>([]);
+  const [totalItems, setTotalItems] = useState(0);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
+  // Antes isto carregava 50 obras uma única vez e filtrava no cliente: acima
+  // de 50 cadastros, buscar uma obra existente devolvia "nenhuma encontrada".
+  // Agora a busca vai para a API, com debounce para não disparar por tecla.
   useEffect(() => {
-    clientApi
-      .get<PaginatedResponse<WorkEntity>>("/api/admin/works", { params: { per_page: 50 } })
-      .then((res) => {
-        if (res.ok) setAllWorks(res.data.data);
-        setLoading(false);
-      });
-  }, []);
+    let cancelled = false;
 
-  const filtered = query.trim()
-    ? allWorks.filter(
-        (w) =>
-          w.title.toLowerCase().includes(query.toLowerCase()) ||
-          (w.themes && w.themes.some((t) => t.name.toLowerCase().includes(query.toLowerCase()))),
-      )
-    : allWorks;
+    const timer = setTimeout(async () => {
+      setLoading(true);
+      const params: Record<string, string | number> = { per_page: PER_PAGE };
+      const trimmed = query.trim();
+      if (trimmed) params.q = trimmed;
+
+      const res = await clientApi.get<PaginatedResponse<WorkEntity>>(
+        "/api/admin/works",
+        { params },
+      );
+      if (cancelled) return;
+
+      if (res.ok) {
+        setWorks(res.data.data);
+        setTotalItems(res.data.pagination.total_items);
+        setError(null);
+      } else {
+        setWorks([]);
+        setTotalItems(0);
+        setError(res.error);
+      }
+      setLoading(false);
+    }, 300);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [query]);
+
+  const hiddenCount = Math.max(0, totalItems - works.length);
 
   return (
     <div>
@@ -46,7 +71,7 @@ export function WorkSearch({ onAdd, addedIds }: WorkSearchProps) {
           }}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filtrar obras por título ou tema..."
+          placeholder="Buscar obras por título..."
           className="h-[44px] w-full rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] pl-9 pr-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
         />
       </div>
@@ -55,13 +80,17 @@ export function WorkSearch({ onAdd, addedIds }: WorkSearchProps) {
         <div className="mt-4 flex justify-center">
           <div className="size-5 animate-spin rounded-full border-2 border-cine-yellow border-t-transparent" />
         </div>
-      ) : filtered.length === 0 ? (
+      ) : error ? (
+        <p role="alert" className="mt-4 text-sm text-destructive">
+          Não foi possível carregar as obras: {error}
+        </p>
+      ) : works.length === 0 ? (
         <p className="mt-4 text-sm text-cine-300">
           {query ? `Nenhuma obra encontrada para "${query}".` : "Nenhuma obra cadastrada."}
         </p>
       ) : (
         <div className="mt-3 max-h-[400px] space-y-3 overflow-y-auto pr-1">
-          {filtered.map((work) => {
+          {works.map((work) => {
             const alreadyAdded = addedIds.has(work.id);
             return (
               <div
@@ -106,6 +135,13 @@ export function WorkSearch({ onAdd, addedIds }: WorkSearchProps) {
               </div>
             );
           })}
+
+          {hiddenCount > 0 && (
+            <p className="pt-1 text-center text-xs text-cine-300">
+              Mostrando {works.length} de {totalItems} obras. Refine a busca para
+              encontrar as demais.
+            </p>
+          )}
         </div>
       )}
     </div>

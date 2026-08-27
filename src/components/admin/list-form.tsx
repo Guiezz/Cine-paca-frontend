@@ -230,6 +230,28 @@ export function ListForm({ initial }: ListFormProps) {
     }
   }
 
+  const snapshot = JSON.stringify([
+    title, stage, description, coverImageUrl, adminNote,
+    themes.map((t) => t.name),
+    orderedItems.map((i) => [i.work.id, i.comment ?? ""]),
+  ]);
+  // useState com valor inicial guarda o retrato do primeiro render; ler um
+  // ref durante o render seria violação da regra do React.
+  const [pristineSnapshot] = useState(snapshot);
+  const isDirty = snapshot !== pristineSnapshot;
+
+  function handleDiscard() {
+    if (
+      isDirty &&
+      !window.confirm(
+        "Descartar as alterações? A seleção e a ordem das obras serão perdidas.",
+      )
+    ) {
+      return;
+    }
+    router.push("/admin/listas");
+  }
+
   const errorRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (error) errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -388,7 +410,7 @@ export function ListForm({ initial }: ListFormProps) {
             <div className="flex justify-end gap-[10px] pt-1">
               <button
                 type="button"
-                onClick={() => router.push("/admin/listas")}
+                onClick={handleDiscard}
                 className="inline-flex min-h-[42px] items-center rounded-full border border-[rgba(215,54,39,0.44)] px-4 text-[13px] font-[650] text-[#D73627] transition-colors hover:bg-destructive/10"
               >
                 {isEditing ? "Descartar alterações" : "Descartar"}

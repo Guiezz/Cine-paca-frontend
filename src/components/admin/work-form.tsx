@@ -189,6 +189,28 @@ export function WorkForm({ initial }: WorkFormProps) {
     }
   }
 
+  const snapshot = JSON.stringify([
+    title, type, duration, year, rating, shortDescription, stage,
+    thumbnailUrl, videoUrl, pedagogicalUse, triggerQuestion,
+    themes.map((t) => t.name), bnccSkills.map((s) => s.id),
+  ]);
+  // useState com valor inicial guarda o retrato do primeiro render; ler um
+  // ref durante o render seria violação da regra do React.
+  const [pristineSnapshot] = useState(snapshot);
+  const isDirty = snapshot !== pristineSnapshot;
+
+  function handleDiscard() {
+    if (
+      isDirty &&
+      !window.confirm(
+        "Descartar as alterações? O que você preencheu nesta tela será perdido.",
+      )
+    ) {
+      return;
+    }
+    router.push("/admin/obras");
+  }
+
   // O bloco de erro fica no rodapé; sem isto o usuário clica em publicar numa
   // tela alta e nada parece ter acontecido.
   const errorRef = useRef<HTMLDivElement>(null);
@@ -520,7 +542,7 @@ export function WorkForm({ initial }: WorkFormProps) {
       <div className="flex items-center justify-end gap-3">
         <button
           type="button"
-          onClick={() => router.push("/admin/obras")}
+          onClick={handleDiscard}
           className="inline-flex h-[42px] items-center rounded-full border border-destructive/50 px-5 text-sm font-[650] text-destructive transition-colors hover:bg-destructive/10"
         >
           Descartar
