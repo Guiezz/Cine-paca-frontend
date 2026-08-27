@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ADMIN_STATUS_LABELS } from "@/lib/labels";
 
 export default function AdminAdminEditarPage() {
   const router = useRouter();
@@ -88,7 +89,7 @@ export default function AdminAdminEditarPage() {
           <label className="block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light">
             Status
           </label>
-          <Select value={status} onValueChange={(v) => setStatus(v ?? "active")}>
+          <Select items={ADMIN_STATUS_LABELS} value={status} onValueChange={(v) => setStatus(v ?? "active")}>
             <SelectTrigger className={selectClass}>
               <SelectValue />
             </SelectTrigger>

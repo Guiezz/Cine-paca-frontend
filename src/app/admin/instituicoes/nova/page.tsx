@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { INSTITUTION_TYPE_LABELS } from "@/lib/labels";
 
 export default function AdminInstituicaoNovaPage() {
   const router = useRouter();
@@ -74,7 +75,11 @@ export default function AdminInstituicaoNovaPage() {
           <label className="block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light">
             Tipo
           </label>
-          <Select value={type} onValueChange={(v) => setType((v ?? "school") as InstitutionType)}>
+          <Select
+            items={INSTITUTION_TYPE_LABELS}
+            value={type}
+            onValueChange={(v) => setType((v ?? "school") as InstitutionType)}
+          >
             <SelectTrigger className={selectClass}>
               <SelectValue />
             </SelectTrigger>

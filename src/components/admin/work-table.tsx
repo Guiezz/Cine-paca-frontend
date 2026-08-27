@@ -2,12 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { WorkEntity } from "@/types/api";
 import { StatusBadge } from "@/components/admin/status-badge";
-
-const typeLabels: Record<string, string> = {
-  short: "Curta",
-  documentary: "Documentário",
-  animation: "Animação",
-};
+import { WORK_TYPE_LABELS_SHORT } from "@/lib/labels";
 
 function ratingLabel(rating: string) {
   if (rating === "L") return "Livre";
@@ -90,14 +85,14 @@ export function WorkTable({ works }: { works: WorkEntity[] }) {
               <tr key={work.id} className="group">
                 <td className="px-4 py-3.5">
                   <div className="grid grid-cols-[94px_1fr] gap-[13px]">
-                    <div className="size-[94px] overflow-hidden rounded-[10px] bg-cine-purple/20">
+                    <div className="aspect-video w-[94px] overflow-hidden rounded-[10px] bg-cine-purple/20">
                       {work.thumbnail_image_url ? (
                         <Image
                           src={work.thumbnail_image_url}
                           alt=""
                           width={94}
-                          height={67}
-                          className="h-[67px] w-full object-cover"
+                          height={53}
+                          className="h-full w-full object-cover"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center text-[10px] text-cine-300">
@@ -112,7 +107,7 @@ export function WorkTable({ works }: { works: WorkEntity[] }) {
                         </p>
                       </div>
                       <p className="text-[13px] leading-[18.2px] text-cine-200">
-                        {typeLabels[work.type] ?? work.type}{work.duration_minutes ? ` · ${work.duration_minutes} min` : ""}
+                        {WORK_TYPE_LABELS_SHORT[work.type] ?? work.type}{work.duration_minutes ? ` · ${work.duration_minutes} min` : ""}
                       </p>
                     </div>
                   </div>

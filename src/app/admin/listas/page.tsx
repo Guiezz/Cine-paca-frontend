@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { STATUS_FILTER_LABELS } from "@/lib/labels";
 
 export default function AdminListasPage() {
   const [items, setItems] = useState<ListEntity[] | null>(null);
@@ -66,7 +67,11 @@ export default function AdminListasPage() {
             className="h-[44px] w-full rounded-full border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-[14px] text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
           />
         </div>
-        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v ?? "all")}>
+        <Select
+          items={STATUS_FILTER_LABELS}
+          value={statusFilter}
+          onValueChange={(v) => setStatusFilter(v ?? "all")}
+        >
           <SelectTrigger className="h-[42px] w-[166px] rounded-full border border-[rgba(80,64,107,0.70)] bg-[rgba(29,17,48,0.38)] px-4 text-base text-cine-200">
             <SelectValue placeholder="Todos os status" />
           </SelectTrigger>

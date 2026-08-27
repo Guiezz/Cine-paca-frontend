@@ -5,12 +5,7 @@ import Image from "next/image";
 import { clientApi } from "@/lib/api-client";
 import type { WorkEntity, PaginatedResponse } from "@/types/api";
 import { Search } from "lucide-react";
-
-const typeLabels: Record<string, string> = {
-  short: "Curta",
-  documentary: "Documentário",
-  animation: "Animação",
-};
+import { WORK_TYPE_LABELS_SHORT } from "@/lib/labels";
 
 interface WorkSearchProps {
   onAdd: (work: WorkEntity) => void;
@@ -73,13 +68,13 @@ export function WorkSearch({ onAdd, addedIds }: WorkSearchProps) {
                 key={work.id}
                 className="grid grid-cols-[120px_1fr_auto] gap-3 rounded-[14px] border border-[rgba(80,64,107,0.70)] bg-[rgba(29,17,48,0.34)] p-3"
               >
-                <div className="h-[80px] w-[120px] shrink-0 overflow-hidden rounded-[10px] bg-cine-800">
+                <div className="aspect-video w-[120px] shrink-0 overflow-hidden rounded-[10px] bg-cine-800">
                   {work.thumbnail_image_url ? (
                     <Image
                       src={work.thumbnail_image_url}
                       alt=""
                       width={120}
-                      height={80}
+                      height={68}
                       className="h-full w-full object-cover"
                     />
                   ) : (
@@ -94,7 +89,7 @@ export function WorkSearch({ onAdd, addedIds }: WorkSearchProps) {
                     {work.title}
                   </h3>
                   <p className="truncate text-[13px] leading-[18.85px] text-cine-200">
-                    {typeLabels[work.type] ?? work.type} ·{" "}
+                    {WORK_TYPE_LABELS_SHORT[work.type] ?? work.type} ·{" "}
                     {work.rating === "L" ? "Livre" : `${work.rating}+`}
                     {work.themes && work.themes.length > 0 && ` · ${work.themes.map((t) => t.name).join(" · ")}`}
                   </p>

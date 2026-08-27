@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { clientApi } from "@/lib/api-client";
 import type { ListEntity, ThemeEntity, WorkEntity } from "@/types/api";
 import { STAGE_OPTIONS } from "@/lib/stages";
+import { STAGE_LABELS } from "@/lib/labels";
 import { TagInput } from "@/components/admin/tag-input";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { WorkSearch } from "@/components/admin/work-search";
@@ -301,7 +302,7 @@ export function ListForm({ initial }: ListFormProps) {
               <label id="lista-etapa-label" className={labelClass}>
                 Público indicado
               </label>
-              <Select value={stage} onValueChange={(v) => setStage(v ?? "")}>
+              <Select items={STAGE_LABELS} value={stage} onValueChange={(v) => setStage(v ?? "")}>
                 <SelectTrigger aria-labelledby="lista-etapa-label" className={selectClass}>
                   <SelectValue placeholder="Selecionar etapa" />
                 </SelectTrigger>

@@ -10,6 +10,7 @@ import type {
   BnccSkillEntity,
 } from "@/types/api";
 import { STAGE_OPTIONS } from "@/lib/stages";
+import { RATING_LABELS, STAGE_LABELS, WORK_TYPE_LABELS } from "@/lib/labels";
 import { TagInput } from "@/components/admin/tag-input";
 import { EditorialChecklist } from "@/components/admin/editorial-checklist";
 import { ImageUpload } from "@/components/admin/image-upload";
@@ -22,24 +23,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const workTypeLabels: Record<string, string> = {
-  short: "Curta-metragem",
-  documentary: "Documentário",
-  animation: "Animação",
-};
-
 // Limite só de orientação: acima disto o texto começa a ser cortado nos cards.
 // Não é imposto como maxLength para não truncar sinopse já cadastrada.
 const SYNOPSIS_SOFT_LIMIT = 280;
-
-const ratingLabels: Record<string, string> = {
-  L: "Livre",
-  "10": "10 anos",
-  "12": "12 anos",
-  "14": "14 anos",
-  "16": "16 anos",
-  "18": "18 anos",
-};
 
 interface WorkFormProps {
   initial?: WorkEntity;
@@ -273,6 +259,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                     Tipo
                   </label>
                   <Select
+                    items={WORK_TYPE_LABELS}
                     value={type}
                     onValueChange={(v) => setType(v ?? "short")}
                   >
@@ -280,7 +267,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(workTypeLabels).map(([value, label]) => (
+                      {Object.entries(WORK_TYPE_LABELS).map(([value, label]) => (
                         <SelectItem key={value} value={value}>
                           {label}
                         </SelectItem>
@@ -323,6 +310,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                     Classificação indicativa
                   </label>
                   <Select
+                    items={RATING_LABELS}
                     value={rating}
                     onValueChange={(v) => setRating(v ?? "L")}
                   >
@@ -330,7 +318,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(ratingLabels).map(([value, label]) => (
+                      {Object.entries(RATING_LABELS).map(([value, label]) => (
                         <SelectItem key={value} value={value}>
                           {label}
                         </SelectItem>
@@ -445,6 +433,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                     Etapa sugerida
                   </label>
                   <Select
+                    items={STAGE_LABELS}
                     value={stage}
                     onValueChange={(v) => setStage(v ?? "")}
                   >
