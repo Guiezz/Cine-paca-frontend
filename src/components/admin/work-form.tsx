@@ -9,6 +9,14 @@ import type {
   ThemeEntity,
   BnccSkillEntity,
 } from "@/types/api";
+import {
+  adminButton,
+  adminHint,
+  adminInput,
+  adminLabel,
+  adminSelectTrigger,
+  adminTextarea,
+} from "@/components/admin/form-controls";
 import { STAGE_OPTIONS } from "@/lib/stages";
 import { RATING_LABELS, STAGE_LABELS, WORK_TYPE_LABELS } from "@/lib/labels";
 import { ThemeSelector, type SelectedTheme } from "@/components/admin/theme-selector";
@@ -237,17 +245,14 @@ export function WorkForm({ initial }: WorkFormProps) {
     "Preencha título, duração e sinopse curta para salvar.";
   const synopsisTooLong = shortDescription.length > SYNOPSIS_SOFT_LIMIT;
 
-  const inputClass =
-    "h-[44px] w-full rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow";
-  const labelClass =
-    "block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light";
+  const inputClass = adminInput();
+  const labelClass = adminLabel();
   const required = (
     <span className="ml-1 text-destructive" title="Campo obrigatório">
       *<span className="sr-only"> (obrigatório)</span>
     </span>
   );
-  const selectClass =
-    "h-[44px] rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-sm text-cine-50";
+  const selectClass = adminSelectTrigger();
 
   const isEditing = !!initial;
 
@@ -448,7 +453,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                     label="Clique para enviar a capa do curta"
                   />
                 </div>
-                <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
+                <p className={`mt-2 ${adminHint()}`}>
                   Use um frame real da obra em proporção 16:9 — é assim que ela
                   aparece nos cards do acervo.
                 </p>
@@ -462,7 +467,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                     label="Clique para enviar a imagem de destaque"
                   />
                 </div>
-                <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
+                <p className={`mt-2 ${adminHint()}`}>
                   Abre a página da obra. Se ficar vazia, a capa é usada no lugar.
                 </p>
               </div>
@@ -504,7 +509,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                   onChange={(e) => setShortDescription(e.target.value)}
                   placeholder="Ex: Um menino descobre que guardar o choro tem peso, e aprende a dividi-lo."
                   aria-describedby="obra-sinopse-ajuda"
-                  className="h-[112px] w-full resize-none rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-2 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+                  className={adminTextarea({ size: "md" })}
                 />
                 <div
                   id="obra-sinopse-ajuda"
@@ -527,7 +532,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                   value={pedagogicalUse}
                   onChange={(e) => setPedagogicalUse(e.target.value)}
                   placeholder="Ex: Abrir a aula com a cena do silêncio e pedir que a turma nomeie o que sentiu."
-                  className="h-[100px] w-full resize-none rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-2 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+                  className={adminTextarea({ size: "md" })}
                 />
               </div>
 
@@ -540,7 +545,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                   value={triggerQuestion}
                   onChange={(e) => setTriggerQuestion(e.target.value)}
                   placeholder="Que pergunta ajuda os alunos a se conectar com a obra?"
-                  className="h-[80px] w-full resize-none rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-2 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+                  className={adminTextarea({ size: "sm" })}
                 />
               </div>
 
@@ -578,7 +583,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                     aria-describedby="obra-faixa-ajuda"
                     className={inputClass}
                   />
-                  <p id="obra-faixa-ajuda" className="mt-1 text-xs text-cine-300">
+                  <p id="obra-faixa-ajuda" className={`mt-1 ${adminHint()}`}>
                     A página da obra exibe como &quot;Indicado para ...&quot;. É
                     diferente da classificação indicativa.
                   </p>
@@ -612,7 +617,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                     onRemove={removeTheme}
                   />
                 </div>
-                <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
+                <p className={`mt-2 ${adminHint()}`}>
                   Reaproveite um tema já cadastrado sempre que possível — criar um
                   parecido só duplica a taxonomia. Ex: Emoções, Cultura brasileira,
                   Infância, Leitura de imagem, Natureza.
@@ -657,7 +662,7 @@ export function WorkForm({ initial }: WorkFormProps) {
         <button
           type="button"
           onClick={handleDiscard}
-          className="inline-flex h-[42px] items-center rounded-full border border-destructive/50 px-5 text-sm font-[650] text-destructive transition-colors hover:bg-destructive/10"
+          className={adminButton({ variant: "destructive" })}
         >
           Descartar
         </button>
@@ -665,7 +670,7 @@ export function WorkForm({ initial }: WorkFormProps) {
           type="submit"
           disabled={submitting || missingRequired}
           title={missingRequired ? incompleteHint : undefined}
-          className="inline-flex h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-5 text-sm font-[650] text-cine-50 transition-colors hover:bg-cine-50/10 disabled:opacity-50"
+          className={adminButton({ variant: "secondary" })}
         >
           {submitting ? "Salvando..." : "Salvar rascunho"}
         </button>
@@ -674,7 +679,7 @@ export function WorkForm({ initial }: WorkFormProps) {
           onClick={() => handleSubmit("published")}
           disabled={submitting || missingRequired}
           title={missingRequired ? incompleteHint : undefined}
-          className="inline-flex h-[42px] items-center rounded-full bg-cine-yellow px-5 text-sm font-[650] text-cine-text-dark transition-colors hover:bg-cine-yellow-dark disabled:opacity-50"
+          className={adminButton({ variant: "primary" })}
         >
           {submitting ? "Publicando..." : "Enviar para publicação"}
         </button>

@@ -3,6 +3,7 @@ import Image from "next/image";
 import type { WorkEntity } from "@/types/api";
 import { StatusBadge } from "@/components/admin/status-badge";
 import { WORK_TYPE_LABELS_SHORT } from "@/lib/labels";
+import { adminButton } from "@/components/admin/form-controls";
 
 function ratingLabel(rating: string) {
   if (rating === "L") return "Livre";
@@ -146,13 +147,13 @@ export function WorkTable({ works }: { works: WorkEntity[] }) {
                   <div className="flex items-center justify-end gap-[8px]">
                     <Link
                       href={`/admin/obras/${work.id}`}
-                      className="inline-flex min-h-[42px] items-center justify-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] tracking-[0.01em] text-cine-50 transition-colors hover:bg-cine-50/10"
+                      className={adminButton({ variant: "secondary", size: "sm" })}
                     >
                       Ver
                     </Link>
                     <Link
                       href={`/admin/obras/${work.id}/editar`}
-                      className="inline-flex min-h-[42px] items-center justify-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] tracking-[0.01em] text-cine-50 transition-colors hover:bg-cine-50/10"
+                      className={adminButton({ variant: "secondary", size: "sm" })}
                     >
                       Editar
                     </Link>

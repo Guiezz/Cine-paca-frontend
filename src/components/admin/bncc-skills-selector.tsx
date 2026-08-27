@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { clientApi } from "@/lib/api-client";
 import type { BnccSkillEntity } from "@/types/api";
 import { X, Search } from "lucide-react";
+import { adminInput } from "@/components/admin/form-controls";
 
 /** A API recusa per_page acima de 50. */
 const PER_PAGE = 50;
@@ -167,7 +168,7 @@ export function BnccSkillsSelector({
             aria-controls={listboxId}
             aria-autocomplete="list"
             placeholder="Buscar habilidade por código, área ou descrição..."
-            className="h-[44px] w-full rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] pl-9 pr-3 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+            className={adminInput({ icon: "left" })}
           />
         </div>
 

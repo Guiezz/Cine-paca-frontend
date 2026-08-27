@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { clientApi } from "@/lib/api-client";
 import type { InstitutionEntity } from "@/types/api";
+import { adminButton } from "@/components/admin/form-controls";
 
 const typeLabels: Record<string, string> = {
   school: "Escola",
@@ -97,7 +98,7 @@ export default function AdminInstituicoesPage() {
                   <td className="px-4 py-3.5">
                     <Link
                       href={`/admin/instituicoes/${item.id}/editar`}
-                      className="inline-flex min-h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] text-cine-50 transition-colors hover:bg-cine-50/10"
+                      className={adminButton({ variant: "secondary", size: "sm" })}
                     >
                       Editar
                     </Link>

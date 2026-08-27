@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { clientApi } from "@/lib/api-client";
 import type { PaginatedResponse, ThemeEntity } from "@/types/api";
 import { Check, Plus, X } from "lucide-react";
+import { adminInput } from "@/components/admin/form-controls";
 
 export interface SelectedTheme {
   id: string;
@@ -178,7 +179,7 @@ export function ThemeSelector({ selected, onAdd, onRemove, inputId }: ThemeSelec
           aria-controls={listboxId}
           aria-autocomplete="list"
           placeholder="Buscar ou criar um tema..."
-          className="h-[42px] w-full rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+          className={adminInput()}
         />
 
         {open && (

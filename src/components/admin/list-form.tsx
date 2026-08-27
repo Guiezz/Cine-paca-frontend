@@ -4,6 +4,13 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clientApi } from "@/lib/api-client";
 import type { ListEntity, ThemeEntity, WorkEntity } from "@/types/api";
+import {
+  adminButton,
+  adminInput,
+  adminLabel,
+  adminSelectTrigger,
+  adminTextarea,
+} from "@/components/admin/form-controls";
 import { STAGE_OPTIONS } from "@/lib/stages";
 import { STAGE_LABELS } from "@/lib/labels";
 import { ThemeSelector, type SelectedTheme } from "@/components/admin/theme-selector";
@@ -263,17 +270,14 @@ export function ListForm({ initial }: ListFormProps) {
     ? incompleteHint
     : "Adicione ao menos uma obra para publicar a lista.";
 
-  const inputClass =
-    "h-[44px] w-full rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow";
-  const labelClass =
-    "block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light";
+  const inputClass = adminInput();
+  const labelClass = adminLabel();
   const required = (
     <span className="ml-1 text-destructive" title="Campo obrigatório">
       *<span className="sr-only"> (obrigatório)</span>
     </span>
   );
-  const selectClass =
-    "h-[44px] rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-base text-cine-50";
+  const selectClass = adminSelectTrigger();
 
   const isEditing = !!initial;
 
@@ -345,7 +349,7 @@ export function ListForm({ initial }: ListFormProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ex: Três curtas para abrir conversa sobre escuta e convivência nos anos iniciais."
-                className="h-[116px] w-full resize-none rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+                className={adminTextarea({ size: "md" })}
               />
             </div>
 
@@ -358,7 +362,7 @@ export function ListForm({ initial }: ListFormProps) {
                 value={adminNote}
                 onChange={(e) => setAdminNote(e.target.value)}
                 placeholder="Ex: Assistir na ordem. Reservar 10 min ao fim de cada obra para a roda de conversa."
-                className="h-[180px] w-full resize-none rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+                className={adminTextarea({ size: "lg" })}
               />
             </div>
 
@@ -407,7 +411,7 @@ export function ListForm({ initial }: ListFormProps) {
               <button
                 type="button"
                 onClick={handleDiscard}
-                className="inline-flex min-h-[42px] items-center rounded-full border border-[rgba(215,54,39,0.44)] px-4 text-[13px] font-[650] text-[#D73627] transition-colors hover:bg-destructive/10"
+                className={adminButton({ variant: "destructive" })}
               >
                 {isEditing ? "Descartar alterações" : "Descartar"}
               </button>
@@ -415,7 +419,7 @@ export function ListForm({ initial }: ListFormProps) {
                 type="submit"
                 disabled={submitting || missingRequired}
                 title={missingRequired ? incompleteHint : undefined}
-                className="inline-flex min-h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] text-cine-50 transition-colors hover:bg-cine-50/10 disabled:opacity-50"
+                className={adminButton({ variant: "secondary" })}
               >
                 {submitting ? "Salvando..." : "Salvar rascunho"}
               </button>
@@ -424,7 +428,7 @@ export function ListForm({ initial }: ListFormProps) {
                 onClick={() => handleSubmit(true)}
                 disabled={submitting || cannotPublish}
                 title={cannotPublish ? publishHint : undefined}
-                className="inline-flex min-h-[42px] items-center rounded-full bg-cine-yellow px-4 text-[13px] font-[650] text-cine-text-dark transition-colors hover:bg-cine-yellow-dark disabled:opacity-50"
+                className={adminButton({ variant: "primary" })}
               >
                 {submitting ? "Publicando..." : "Publicar lista"}
               </button>

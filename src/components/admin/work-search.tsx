@@ -6,6 +6,7 @@ import { clientApi } from "@/lib/api-client";
 import type { WorkEntity, PaginatedResponse } from "@/types/api";
 import { Search } from "lucide-react";
 import { WORK_TYPE_LABELS_SHORT } from "@/lib/labels";
+import { adminButton, adminInput } from "@/components/admin/form-controls";
 
 interface WorkSearchProps {
   onAdd: (work: WorkEntity) => void;
@@ -72,7 +73,7 @@ export function WorkSearch({ onAdd, addedIds }: WorkSearchProps) {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Buscar obras por título..."
-          className="h-[44px] w-full rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] pl-9 pr-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+          className={adminInput({ icon: "left" })}
         />
       </div>
 
@@ -128,7 +129,7 @@ export function WorkSearch({ onAdd, addedIds }: WorkSearchProps) {
                   type="button"
                   disabled={alreadyAdded}
                   onClick={() => onAdd(work)}
-                  className="inline-flex h-[42px] shrink-0 items-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] text-cine-50 transition-colors hover:bg-cine-50/10 disabled:opacity-40"
+                  className={adminButton({ variant: "secondary", size: "sm" })}
                 >
                   {alreadyAdded ? "Adicionado" : "Adicionar"}
                 </button>

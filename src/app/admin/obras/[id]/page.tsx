@@ -7,6 +7,7 @@ import Image from "next/image";
 import { clientApi } from "@/lib/api-client";
 import type { WorkEntity } from "@/types/api";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { adminButton } from "@/components/admin/form-controls";
 
 const typeLabels: Record<string, string> = {
   short: "Curta-metragem",
@@ -105,7 +106,7 @@ export default function AdminObraDetailPage() {
           ))}
           <Link
             href={`/admin/obras/${work.id}/editar`}
-            className="inline-flex h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] text-cine-50 transition-colors hover:bg-cine-50/10"
+            className={adminButton({ variant: "secondary", size: "sm" })}
           >
             Editar
           </Link>
