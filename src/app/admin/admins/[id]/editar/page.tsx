@@ -72,7 +72,7 @@ export default function AdminAdminEditarPage() {
             ADMINISTRAÇÃO
           </span>
         </div>
-        <h1 className="font-heading text-[58px] font-bold leading-[59.74px] tracking-[-1.74px] text-cine-50">
+        <h1 className="font-heading text-3xl md:text-5xl lg:text-[58px] font-bold leading-tight lg:leading-[59.74px] tracking-tight lg:tracking-[-1.74px] text-cine-50">
           Editar admin
         </h1>
       </div>

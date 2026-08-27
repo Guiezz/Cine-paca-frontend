@@ -286,8 +286,8 @@ export function ListForm({ initial }: ListFormProps) {
       }}
       className="flex flex-col gap-[22px]"
     >
-      <div className="flex gap-[22px]">
-        <div className="w-[508px] shrink-0 rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6">
+      <div className="flex flex-col gap-[22px] lg:flex-row">
+        <div className="w-full rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6 lg:w-[508px] lg:shrink-0">
           <div className="flex items-center gap-3">
             <h2 className="font-heading text-[22px] font-bold tracking-[-0.44px] text-cine-50">
               Contexto da lista
@@ -403,7 +403,7 @@ export function ListForm({ initial }: ListFormProps) {
               <p className="text-right text-xs text-cine-300">{publishHint}</p>
             )}
 
-            <div className="flex justify-end gap-[10px] pt-1">
+            <div className="flex flex-wrap justify-end gap-[10px] pt-1">
               <button
                 type="button"
                 onClick={handleDiscard}

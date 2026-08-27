@@ -112,7 +112,7 @@ export default function AdminObraDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-[1fr_340px] gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-4">
           {work.thumbnail_image_url && (
             <div className="overflow-hidden rounded-[18px]">

@@ -260,7 +260,7 @@ export function WorkForm({ initial }: WorkFormProps) {
       }}
       className="flex flex-col gap-[18px]"
     >
-      <div className="grid grid-cols-[1fr_340px] gap-[18px]">
+      <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[1fr_340px]">
         <div className="rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6">
           {/* Seção 1: Identificação da obra */}
           <div>
@@ -286,7 +286,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label id="obra-tipo-label" className={labelClass}>
                     Tipo
@@ -324,7 +324,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="obra-ano" className={labelClass}>
                     Ano de lançamento
@@ -373,7 +373,7 @@ export function WorkForm({ initial }: WorkFormProps) {
             </div>
 
             <div className="mt-5 space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="obra-diretor" className={labelClass}>
                     Direção
@@ -400,7 +400,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="obra-pais" className={labelClass}>
                     País
@@ -438,7 +438,7 @@ export function WorkForm({ initial }: WorkFormProps) {
               <div className="flex-1 border-t border-[rgba(80,64,107,0.74)]" />
             </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-4">
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
               <div>
                 <span className={labelClass}>Capa</span>
                 <div className="mt-1.5">
@@ -544,7 +544,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label id="obra-etapa-label" className={labelClass}>
                     Etapa sugerida
@@ -653,7 +653,7 @@ export function WorkForm({ initial }: WorkFormProps) {
         <p className="text-right text-xs text-cine-300">{incompleteHint}</p>
       )}
 
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex flex-wrap items-center justify-end gap-3">
         <button
           type="button"
           onClick={handleDiscard}

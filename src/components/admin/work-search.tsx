@@ -95,9 +95,9 @@ export function WorkSearch({ onAdd, addedIds }: WorkSearchProps) {
             return (
               <div
                 key={work.id}
-                className="grid grid-cols-[120px_1fr_auto] gap-3 rounded-[14px] border border-[rgba(80,64,107,0.70)] bg-[rgba(29,17,48,0.34)] p-3"
+                className="flex flex-col gap-3 rounded-[14px] border border-[rgba(80,64,107,0.70)] bg-[rgba(29,17,48,0.34)] p-3 sm:grid sm:grid-cols-[120px_1fr_auto] sm:items-center"
               >
-                <div className="aspect-video w-[120px] shrink-0 overflow-hidden rounded-[10px] bg-cine-800">
+                <div className="aspect-video w-full shrink-0 overflow-hidden rounded-[10px] bg-cine-800 sm:w-[120px]">
                   {work.thumbnail_image_url ? (
                     <Image
                       src={work.thumbnail_image_url}

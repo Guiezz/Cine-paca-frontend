@@ -54,8 +54,8 @@ export function WorkTable({ works }: { works: WorkEntity[] }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337]">
-      <table className="w-full text-left text-sm">
+    <div className="overflow-x-auto rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337]">
+      <table className="w-full min-w-[900px] text-left text-sm">
         <thead>
           <tr>
             <th className="w-[363px] px-4 py-3.5 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light">

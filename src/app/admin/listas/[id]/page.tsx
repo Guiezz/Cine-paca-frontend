@@ -65,7 +65,7 @@ export default function AdminListaDetailPage() {
 
       <p className="max-w-2xl text-base leading-[24.8px] text-cine-200">{list.description}</p>
 
-      <div className="grid grid-cols-[1fr_340px] gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-4">
           <div className="rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6">
             <h2 className="font-heading text-[22px] font-bold tracking-[-0.66px] text-cine-50">
