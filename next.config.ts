@@ -29,7 +29,13 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: "**.supabase.co",
       },
-
+      // Cloudflare R2 (bucket público). Host fixo de propósito: "**.r2.dev"
+      // liberaria o bucket r2.dev de qualquer conta, permitindo usar o
+      // /_next/image deste projeto para otimizar imagens de terceiros.
+      {
+        protocol: "https",
+        hostname: "pub-439a7473a593405c998512ddc834adc0.r2.dev",
+      },
     ],
   },
   async rewrites() {
