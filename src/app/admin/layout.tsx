@@ -30,7 +30,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     return (
       <div className="flex min-h-dvh flex-col bg-cine-900">
         <AdminHeader />
-        <main className="mx-auto w-full max-w-[1140px] flex-1 pb-10">
+        <main className="mx-auto w-full max-w-[1140px] flex-1 px-4 pb-10 md:px-6 lg:px-0">
           {children}
         </main>
       </div>
@@ -52,7 +52,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-dvh flex-col bg-cine-900">
       <AdminHeader />
-      <main className="mx-auto w-full max-w-[1140px] flex-1 pb-10">
+      <main className="mx-auto w-full max-w-[1140px] flex-1 px-4 pb-10 md:px-6 lg:px-0">
         {children}
       </main>
     </div>

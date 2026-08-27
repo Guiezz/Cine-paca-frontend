@@ -12,6 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { STATUS_FILTER_LABELS } from "@/lib/labels";
 
 export default function AdminListasPage() {
   const [items, setItems] = useState<ListEntity[] | null>(null);
@@ -33,7 +34,7 @@ export default function AdminListasPage() {
 
   return (
     <div className="space-y-[18px]">
-      <div className="grid grid-cols-[1fr_164px] pt-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_164px] pt-4">
         <div className="flex flex-col gap-[11.4px]">
           <div className="flex items-center gap-2">
             <div className="h-[2px] w-[28px] bg-cine-yellow" />
@@ -41,7 +42,7 @@ export default function AdminListasPage() {
               GESTÃO CURATORIAL
             </span>
           </div>
-          <h1 className="font-heading text-[58px] font-bold leading-[59.74px] tracking-[-1.74px] text-cine-50">
+          <h1 className="font-heading text-3xl md:text-5xl lg:text-[58px] font-bold leading-tight lg:leading-[59.74px] tracking-tight lg:tracking-[-1.74px] text-cine-50">
             Listas existentes
           </h1>
           <p className="max-w-[720px] text-base leading-[24.8px] text-cine-200">
@@ -66,8 +67,12 @@ export default function AdminListasPage() {
             className="h-[44px] w-full rounded-full border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-[14px] text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
           />
         </div>
-        <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v ?? "all")}>
-          <SelectTrigger className="h-[42px] w-[166px] rounded-full border border-[rgba(80,64,107,0.70)] bg-[rgba(29,17,48,0.38)] px-4 text-base text-cine-200">
+        <Select
+          items={STATUS_FILTER_LABELS}
+          value={statusFilter}
+          onValueChange={(v) => setStatusFilter(v ?? "all")}
+        >
+          <SelectTrigger className="h-[42px] w-full rounded-full sm:w-[166px] border border-[rgba(80,64,107,0.70)] bg-[rgba(29,17,48,0.38)] px-4 text-base text-cine-200">
             <SelectValue placeholder="Todos os status" />
           </SelectTrigger>
           <SelectContent>
@@ -89,7 +94,7 @@ export default function AdminListasPage() {
           <p className="text-xs text-cine-300">Crie sua primeira lista para começar.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {list.map((item) => (
             <ListCard key={item.id} list={item} />
           ))}

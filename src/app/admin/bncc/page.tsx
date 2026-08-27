@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { clientApi } from "@/lib/api-client";
 import type { BnccSkillEntity } from "@/types/api";
+import { adminButton } from "@/components/admin/form-controls";
 
 export default function AdminBnccPage() {
   const [items, setItems] = useState<BnccSkillEntity[] | null>(null);
@@ -18,7 +19,7 @@ export default function AdminBnccPage() {
 
   return (
     <div className="space-y-[18px]">
-      <div className="grid grid-cols-[1fr_164px] pt-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-[1fr_164px] pt-4">
         <div className="flex flex-col gap-[11.4px]">
           <div className="flex items-center gap-2">
             <div className="h-[2px] w-[28px] bg-cine-yellow" />
@@ -26,7 +27,7 @@ export default function AdminBnccPage() {
               TAXONOMIA
             </span>
           </div>
-          <h1 className="font-heading text-[58px] font-bold leading-[59.74px] tracking-[-1.74px] text-cine-50">
+          <h1 className="font-heading text-3xl md:text-5xl lg:text-[58px] font-bold leading-tight lg:leading-[59.74px] tracking-tight lg:tracking-[-1.74px] text-cine-50">
             Habilidades BNCC
           </h1>
           <p className="max-w-[720px] text-base leading-[24.8px] text-cine-200">
@@ -81,7 +82,7 @@ export default function AdminBnccPage() {
                   <td className="px-4 py-3.5">
                     <Link
                       href={`/admin/bncc/${item.id}/editar`}
-                      className="inline-flex min-h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] text-cine-50 transition-colors hover:bg-cine-50/10"
+                      className={adminButton({ variant: "secondary", size: "sm" })}
                     >
                       Editar
                     </Link>

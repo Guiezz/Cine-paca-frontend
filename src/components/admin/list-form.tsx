@@ -4,8 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clientApi } from "@/lib/api-client";
 import type { ListEntity, ThemeEntity, WorkEntity } from "@/types/api";
+import {
+  adminButton,
+  adminInput,
+  adminLabel,
+  adminSelectTrigger,
+  adminTextarea,
+} from "@/components/admin/form-controls";
 import { STAGE_OPTIONS } from "@/lib/stages";
-import { TagInput } from "@/components/admin/tag-input";
+import { STAGE_LABELS } from "@/lib/labels";
+import { ThemeSelector, type SelectedTheme } from "@/components/admin/theme-selector";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { WorkSearch } from "@/components/admin/work-search";
 import { OrderedList } from "@/components/admin/ordered-list";
@@ -57,13 +65,10 @@ export function ListForm({ initial }: ListFormProps) {
   const [themes, setThemes] = useState<{ id: string; name: string }[]>(
     initial?.themes?.map((t) => ({ id: t.id, name: t.name })) ?? [],
   );
-  const [nextThemeId, setNextThemeId] = useState(1);
-
   const addedIds = new Set(orderedItems.map((i) => i.work.id));
 
-  function addTheme(name: string) {
-    setThemes((prev) => [...prev, { id: `new-${nextThemeId}`, name }]);
-    setNextThemeId((n) => n + 1);
+  function addTheme(theme: SelectedTheme) {
+    setThemes((prev) => [...prev, theme]);
   }
 
   function removeTheme(id: string) {
@@ -229,6 +234,28 @@ export function ListForm({ initial }: ListFormProps) {
     }
   }
 
+  const snapshot = JSON.stringify([
+    title, stage, description, coverImageUrl, adminNote,
+    themes.map((t) => t.name),
+    orderedItems.map((i) => [i.work.id, i.comment ?? ""]),
+  ]);
+  // useState com valor inicial guarda o retrato do primeiro render; ler um
+  // ref durante o render seria violação da regra do React.
+  const [pristineSnapshot] = useState(snapshot);
+  const isDirty = snapshot !== pristineSnapshot;
+
+  function handleDiscard() {
+    if (
+      isDirty &&
+      !window.confirm(
+        "Descartar as alterações? A seleção e a ordem das obras serão perdidas.",
+      )
+    ) {
+      return;
+    }
+    router.push("/admin/listas");
+  }
+
   const errorRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (error) errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -243,17 +270,14 @@ export function ListForm({ initial }: ListFormProps) {
     ? incompleteHint
     : "Adicione ao menos uma obra para publicar a lista.";
 
-  const inputClass =
-    "h-[44px] w-full rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow";
-  const labelClass =
-    "block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light";
+  const inputClass = adminInput();
+  const labelClass = adminLabel();
   const required = (
     <span className="ml-1 text-destructive" title="Campo obrigatório">
       *<span className="sr-only"> (obrigatório)</span>
     </span>
   );
-  const selectClass =
-    "h-[44px] rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-base text-cine-50";
+  const selectClass = adminSelectTrigger();
 
   const isEditing = !!initial;
 
@@ -266,8 +290,8 @@ export function ListForm({ initial }: ListFormProps) {
       }}
       className="flex flex-col gap-[22px]"
     >
-      <div className="flex gap-[22px]">
-        <div className="w-[508px] shrink-0 rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6">
+      <div className="flex flex-col gap-[22px] lg:flex-row">
+        <div className="w-full rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6 lg:w-[508px] lg:shrink-0">
           <div className="flex items-center gap-3">
             <h2 className="font-heading text-[22px] font-bold tracking-[-0.44px] text-cine-50">
               Contexto da lista
@@ -301,7 +325,7 @@ export function ListForm({ initial }: ListFormProps) {
               <label id="lista-etapa-label" className={labelClass}>
                 Público indicado
               </label>
-              <Select value={stage} onValueChange={(v) => setStage(v ?? "")}>
+              <Select items={STAGE_LABELS} value={stage} onValueChange={(v) => setStage(v ?? "")}>
                 <SelectTrigger aria-labelledby="lista-etapa-label" className={selectClass}>
                   <SelectValue placeholder="Selecionar etapa" />
                 </SelectTrigger>
@@ -325,7 +349,7 @@ export function ListForm({ initial }: ListFormProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ex: Três curtas para abrir conversa sobre escuta e convivência nos anos iniciais."
-                className="h-[116px] w-full resize-none rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+                className={adminTextarea({ size: "md" })}
               />
             </div>
 
@@ -338,7 +362,7 @@ export function ListForm({ initial }: ListFormProps) {
                 value={adminNote}
                 onChange={(e) => setAdminNote(e.target.value)}
                 placeholder="Ex: Assistir na ordem. Reservar 10 min ao fim de cada obra para a roda de conversa."
-                className="h-[180px] w-full resize-none rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+                className={adminTextarea({ size: "lg" })}
               />
             </div>
 
@@ -347,12 +371,11 @@ export function ListForm({ initial }: ListFormProps) {
                 Temas principais
               </label>
               <div className="mt-1.5">
-                <TagInput
+                <ThemeSelector
                   inputId="lista-temas"
-                  tags={themes}
+                  selected={themes}
                   onAdd={addTheme}
                   onRemove={removeTheme}
-                  placeholder="Digite um tema..."
                 />
               </div>
             </div>
@@ -384,11 +407,11 @@ export function ListForm({ initial }: ListFormProps) {
               <p className="text-right text-xs text-cine-300">{publishHint}</p>
             )}
 
-            <div className="flex justify-end gap-[10px] pt-1">
+            <div className="flex flex-wrap justify-end gap-[10px] pt-1">
               <button
                 type="button"
-                onClick={() => router.push("/admin/listas")}
-                className="inline-flex min-h-[42px] items-center rounded-full border border-[rgba(215,54,39,0.44)] px-4 text-[13px] font-[650] text-[#D73627] transition-colors hover:bg-destructive/10"
+                onClick={handleDiscard}
+                className={adminButton({ variant: "destructive" })}
               >
                 {isEditing ? "Descartar alterações" : "Descartar"}
               </button>
@@ -396,7 +419,7 @@ export function ListForm({ initial }: ListFormProps) {
                 type="submit"
                 disabled={submitting || missingRequired}
                 title={missingRequired ? incompleteHint : undefined}
-                className="inline-flex min-h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] text-cine-50 transition-colors hover:bg-cine-50/10 disabled:opacity-50"
+                className={adminButton({ variant: "secondary" })}
               >
                 {submitting ? "Salvando..." : "Salvar rascunho"}
               </button>
@@ -405,7 +428,7 @@ export function ListForm({ initial }: ListFormProps) {
                 onClick={() => handleSubmit(true)}
                 disabled={submitting || cannotPublish}
                 title={cannotPublish ? publishHint : undefined}
-                className="inline-flex min-h-[42px] items-center rounded-full bg-cine-yellow px-4 text-[13px] font-[650] text-cine-text-dark transition-colors hover:bg-cine-yellow-dark disabled:opacity-50"
+                className={adminButton({ variant: "primary" })}
               >
                 {submitting ? "Publicando..." : "Publicar lista"}
               </button>

@@ -9,8 +9,17 @@ import type {
   ThemeEntity,
   BnccSkillEntity,
 } from "@/types/api";
+import {
+  adminButton,
+  adminHint,
+  adminInput,
+  adminLabel,
+  adminSelectTrigger,
+  adminTextarea,
+} from "@/components/admin/form-controls";
 import { STAGE_OPTIONS } from "@/lib/stages";
-import { TagInput } from "@/components/admin/tag-input";
+import { RATING_LABELS, STAGE_LABELS, WORK_TYPE_LABELS } from "@/lib/labels";
+import { ThemeSelector, type SelectedTheme } from "@/components/admin/theme-selector";
 import { EditorialChecklist } from "@/components/admin/editorial-checklist";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { BnccSkillsSelector } from "@/components/admin/bncc-skills-selector";
@@ -22,24 +31,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const workTypeLabels: Record<string, string> = {
-  short: "Curta-metragem",
-  documentary: "Documentário",
-  animation: "Animação",
-};
-
 // Limite só de orientação: acima disto o texto começa a ser cortado nos cards.
 // Não é imposto como maxLength para não truncar sinopse já cadastrada.
 const SYNOPSIS_SOFT_LIMIT = 280;
-
-const ratingLabels: Record<string, string> = {
-  L: "Livre",
-  "10": "10 anos",
-  "12": "12 anos",
-  "14": "14 anos",
-  "16": "16 anos",
-  "18": "18 anos",
-};
 
 interface WorkFormProps {
   initial?: WorkEntity;
@@ -73,7 +67,14 @@ export function WorkForm({ initial }: WorkFormProps) {
   const [thumbnailUrl, setThumbnailUrl] = useState(
     initial?.thumbnail_image_url ?? "",
   );
+  const [heroImageUrl, setHeroImageUrl] = useState(initial?.hero_image_url ?? "");
   const [videoUrl, setVideoUrl] = useState(initial?.external_video_url ?? "");
+
+  const [director, setDirector] = useState(initial?.director ?? "");
+  const [producer, setProducer] = useState(initial?.producer ?? "");
+  const [country, setCountry] = useState(initial?.country ?? "");
+  const [language, setLanguage] = useState(initial?.language ?? "");
+  const [ageRange, setAgeRange] = useState(initial?.age_range ?? "");
   const [pedagogicalUse, setPedagogicalUse] = useState(
     initial?.pedagogical_use ?? "",
   );
@@ -84,13 +85,10 @@ export function WorkForm({ initial }: WorkFormProps) {
   const [themes, setThemes] = useState<{ id: string; name: string }[]>(
     initial?.themes?.map((t) => ({ id: t.id, name: t.name })) ?? [],
   );
-  const [nextThemeId, setNextThemeId] = useState(1);
-
   const [checklist, setChecklist] = useState<Record<string, boolean>>({});
 
-  function addTheme(name: string) {
-    setThemes((prev) => [...prev, { id: `new-${nextThemeId}`, name }]);
-    setNextThemeId((n) => n + 1);
+  function addTheme(theme: SelectedTheme) {
+    setThemes((prev) => [...prev, theme]);
   }
 
   function removeTheme(id: string) {
@@ -161,8 +159,14 @@ export function WorkForm({ initial }: WorkFormProps) {
         short_description: shortDescription || undefined,
         synopsis: shortDescription,
         stage: stage || undefined,
+        age_range: ageRange || undefined,
         thumbnail_image_url: thumbnailUrl || undefined,
+        hero_image_url: heroImageUrl || undefined,
         external_video_url: videoUrl || undefined,
+        director: director || undefined,
+        producer: producer || undefined,
+        country: country || undefined,
+        language: language || undefined,
         pedagogical_use: pedagogicalUse || undefined,
         trigger_question: triggerQuestion || undefined,
         theme_ids: themeIds.length > 0 ? themeIds : undefined,
@@ -203,6 +207,29 @@ export function WorkForm({ initial }: WorkFormProps) {
     }
   }
 
+  const snapshot = JSON.stringify([
+    title, type, duration, year, rating, shortDescription, stage, ageRange,
+    thumbnailUrl, heroImageUrl, videoUrl, pedagogicalUse, triggerQuestion,
+    director, producer, country, language,
+    themes.map((t) => t.name), bnccSkills.map((s) => s.id),
+  ]);
+  // useState com valor inicial guarda o retrato do primeiro render; ler um
+  // ref durante o render seria violação da regra do React.
+  const [pristineSnapshot] = useState(snapshot);
+  const isDirty = snapshot !== pristineSnapshot;
+
+  function handleDiscard() {
+    if (
+      isDirty &&
+      !window.confirm(
+        "Descartar as alterações? O que você preencheu nesta tela será perdido.",
+      )
+    ) {
+      return;
+    }
+    router.push("/admin/obras");
+  }
+
   // O bloco de erro fica no rodapé; sem isto o usuário clica em publicar numa
   // tela alta e nada parece ter acontecido.
   const errorRef = useRef<HTMLDivElement>(null);
@@ -218,17 +245,14 @@ export function WorkForm({ initial }: WorkFormProps) {
     "Preencha título, duração e sinopse curta para salvar.";
   const synopsisTooLong = shortDescription.length > SYNOPSIS_SOFT_LIMIT;
 
-  const inputClass =
-    "h-[44px] w-full rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow";
-  const labelClass =
-    "block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light";
+  const inputClass = adminInput();
+  const labelClass = adminLabel();
   const required = (
     <span className="ml-1 text-destructive" title="Campo obrigatório">
       *<span className="sr-only"> (obrigatório)</span>
     </span>
   );
-  const selectClass =
-    "h-[44px] rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-sm text-cine-50";
+  const selectClass = adminSelectTrigger();
 
   const isEditing = !!initial;
 
@@ -241,7 +265,7 @@ export function WorkForm({ initial }: WorkFormProps) {
       }}
       className="flex flex-col gap-[18px]"
     >
-      <div className="grid grid-cols-[1fr_340px] gap-[18px]">
+      <div className="grid grid-cols-1 gap-[18px] lg:grid-cols-[1fr_340px]">
         <div className="rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6">
           {/* Seção 1: Identificação da obra */}
           <div>
@@ -267,12 +291,13 @@ export function WorkForm({ initial }: WorkFormProps) {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label id="obra-tipo-label" className={labelClass}>
                     Tipo
                   </label>
                   <Select
+                    items={WORK_TYPE_LABELS}
                     value={type}
                     onValueChange={(v) => setType(v ?? "short")}
                   >
@@ -280,7 +305,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(workTypeLabels).map(([value, label]) => (
+                      {Object.entries(WORK_TYPE_LABELS).map(([value, label]) => (
                         <SelectItem key={value} value={value}>
                           {label}
                         </SelectItem>
@@ -304,7 +329,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label htmlFor="obra-ano" className={labelClass}>
                     Ano de lançamento
@@ -323,6 +348,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                     Classificação indicativa
                   </label>
                   <Select
+                    items={RATING_LABELS}
                     value={rating}
                     onValueChange={(v) => setRating(v ?? "L")}
                   >
@@ -330,7 +356,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(ratingLabels).map(([value, label]) => (
+                      {Object.entries(RATING_LABELS).map(([value, label]) => (
                         <SelectItem key={value} value={value}>
                           {label}
                         </SelectItem>
@@ -342,7 +368,73 @@ export function WorkForm({ initial }: WorkFormProps) {
             </div>
           </div>
 
-          {/* Seção 2: Imagens e exibição */}
+          {/* Seção 2: Ficha técnica */}
+          <div className="mt-8 border-t border-[rgba(80,64,107,0.74)] pt-8">
+            <div className="flex items-center gap-4">
+              <h2 className="font-heading text-[22px] font-bold tracking-[-0.66px] text-cine-50">
+                Ficha técnica
+              </h2>
+              <div className="flex-1 border-t border-[rgba(80,64,107,0.74)]" />
+            </div>
+
+            <div className="mt-5 space-y-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="obra-diretor" className={labelClass}>
+                    Direção
+                  </label>
+                  <input
+                    id="obra-diretor"
+                    value={director}
+                    onChange={(e) => setDirector(e.target.value)}
+                    placeholder="Ex: Ana Rodrigues"
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="obra-producao" className={labelClass}>
+                    Produção
+                  </label>
+                  <input
+                    id="obra-producao"
+                    value={producer}
+                    onChange={(e) => setProducer(e.target.value)}
+                    placeholder="Ex: Curta Coletivo"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <div>
+                  <label htmlFor="obra-pais" className={labelClass}>
+                    País
+                  </label>
+                  <input
+                    id="obra-pais"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    placeholder="Ex: Brasil"
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="obra-idioma" className={labelClass}>
+                    Idioma
+                  </label>
+                  <input
+                    id="obra-idioma"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    placeholder="Ex: Português"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Seção 3: Imagens e exibição */}
           <div className="mt-8 border-t border-[rgba(80,64,107,0.74)] pt-8">
             <div className="flex items-center gap-4">
               <h2 className="font-heading text-[22px] font-bold tracking-[-0.66px] text-cine-50">
@@ -351,16 +443,34 @@ export function WorkForm({ initial }: WorkFormProps) {
               <div className="flex-1 border-t border-[rgba(80,64,107,0.74)]" />
             </div>
 
-            <div className="mt-5">
-              <ImageUpload
-                value={thumbnailUrl}
-                onChange={setThumbnailUrl}
-                label="Clique para enviar a capa do curta"
-              />
-              <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
-                Use um frame real da obra em proporção 16:9 — é assim que ela
-                aparece nos cards do acervo.
-              </p>
+            <div className="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <span className={labelClass}>Capa</span>
+                <div className="mt-1.5">
+                  <ImageUpload
+                    value={thumbnailUrl}
+                    onChange={setThumbnailUrl}
+                    label="Clique para enviar a capa do curta"
+                  />
+                </div>
+                <p className={`mt-2 ${adminHint()}`}>
+                  Use um frame real da obra em proporção 16:9 — é assim que ela
+                  aparece nos cards do acervo.
+                </p>
+              </div>
+              <div>
+                <span className={labelClass}>Imagem de destaque</span>
+                <div className="mt-1.5">
+                  <ImageUpload
+                    value={heroImageUrl}
+                    onChange={setHeroImageUrl}
+                    label="Clique para enviar a imagem de destaque"
+                  />
+                </div>
+                <p className={`mt-2 ${adminHint()}`}>
+                  Abre a página da obra. Se ficar vazia, a capa é usada no lugar.
+                </p>
+              </div>
             </div>
 
             <div className="mt-4">
@@ -378,7 +488,7 @@ export function WorkForm({ initial }: WorkFormProps) {
             </div>
           </div>
 
-          {/* Seção 3: Curadoria pedagógica */}
+          {/* Seção 4: Curadoria pedagógica */}
           <div className="mt-8 border-t border-[rgba(80,64,107,0.74)] pt-8">
             <div className="flex items-center gap-4">
               <h2 className="font-heading text-[22px] font-bold tracking-[-0.66px] text-cine-50">
@@ -399,7 +509,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                   onChange={(e) => setShortDescription(e.target.value)}
                   placeholder="Ex: Um menino descobre que guardar o choro tem peso, e aprende a dividi-lo."
                   aria-describedby="obra-sinopse-ajuda"
-                  className="h-[112px] w-full resize-none rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-2 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+                  className={adminTextarea({ size: "md" })}
                 />
                 <div
                   id="obra-sinopse-ajuda"
@@ -422,7 +532,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                   value={pedagogicalUse}
                   onChange={(e) => setPedagogicalUse(e.target.value)}
                   placeholder="Ex: Abrir a aula com a cena do silêncio e pedir que a turma nomeie o que sentiu."
-                  className="h-[100px] w-full resize-none rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-2 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+                  className={adminTextarea({ size: "md" })}
                 />
               </div>
 
@@ -435,16 +545,17 @@ export function WorkForm({ initial }: WorkFormProps) {
                   value={triggerQuestion}
                   onChange={(e) => setTriggerQuestion(e.target.value)}
                   placeholder="Que pergunta ajuda os alunos a se conectar com a obra?"
-                  className="h-[80px] w-full resize-none rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-2 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+                  className={adminTextarea({ size: "sm" })}
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div>
                   <label id="obra-etapa-label" className={labelClass}>
                     Etapa sugerida
                   </label>
                   <Select
+                    items={STAGE_LABELS}
                     value={stage}
                     onValueChange={(v) => setStage(v ?? "")}
                   >
@@ -461,17 +572,36 @@ export function WorkForm({ initial }: WorkFormProps) {
                   </Select>
                 </div>
                 <div>
-                  <label htmlFor="obra-bncc" className={labelClass}>
-                    Habilidades BNCC
+                  <label htmlFor="obra-faixa" className={labelClass}>
+                    Faixa etária
                   </label>
-                  <div className="mt-1.5">
-                    <BnccSkillsSelector
-                      inputId="obra-bncc"
-                      selected={bnccSkills}
-                      onAdd={addBnccSkill}
-                      onRemove={removeBnccSkill}
-                    />
-                  </div>
+                  <input
+                    id="obra-faixa"
+                    value={ageRange}
+                    onChange={(e) => setAgeRange(e.target.value)}
+                    placeholder="Ex: 6 a 10 anos"
+                    aria-describedby="obra-faixa-ajuda"
+                    className={inputClass}
+                  />
+                  <p id="obra-faixa-ajuda" className={`mt-1 ${adminHint()}`}>
+                    A página da obra exibe como &quot;Indicado para ...&quot;. É
+                    diferente da classificação indicativa.
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="obra-bncc" className={labelClass}>
+                  Habilidades BNCC
+                </label>
+                <div className="mt-1.5">
+                  <BnccSkillsSelector
+                    inputId="obra-bncc"
+                    stage={stage}
+                    selected={bnccSkills}
+                    onAdd={addBnccSkill}
+                    onRemove={removeBnccSkill}
+                  />
                 </div>
               </div>
 
@@ -480,17 +610,17 @@ export function WorkForm({ initial }: WorkFormProps) {
                   Temas
                 </label>
                 <div className="mt-1.5">
-                  <TagInput
+                  <ThemeSelector
                     inputId="obra-temas"
-                    tags={themes}
+                    selected={themes}
                     onAdd={addTheme}
                     onRemove={removeTheme}
-                    placeholder="Digite um tema..."
                   />
                 </div>
-                <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
-                  Adicione quantos temas forem necessários. Ex: Emoções, Cultura
-                  brasileira, Infância, Leitura de imagem, Natureza etc.
+                <p className={`mt-2 ${adminHint()}`}>
+                  Reaproveite um tema já cadastrado sempre que possível — criar um
+                  parecido só duplica a taxonomia. Ex: Emoções, Cultura brasileira,
+                  Infância, Leitura de imagem, Natureza.
                 </p>
               </div>
             </div>
@@ -528,11 +658,11 @@ export function WorkForm({ initial }: WorkFormProps) {
         <p className="text-right text-xs text-cine-300">{incompleteHint}</p>
       )}
 
-      <div className="flex items-center justify-end gap-3">
+      <div className="flex flex-wrap items-center justify-end gap-3">
         <button
           type="button"
-          onClick={() => router.push("/admin/obras")}
-          className="inline-flex h-[42px] items-center rounded-full border border-destructive/50 px-5 text-sm font-[650] text-destructive transition-colors hover:bg-destructive/10"
+          onClick={handleDiscard}
+          className={adminButton({ variant: "destructive" })}
         >
           Descartar
         </button>
@@ -540,7 +670,7 @@ export function WorkForm({ initial }: WorkFormProps) {
           type="submit"
           disabled={submitting || missingRequired}
           title={missingRequired ? incompleteHint : undefined}
-          className="inline-flex h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-5 text-sm font-[650] text-cine-50 transition-colors hover:bg-cine-50/10 disabled:opacity-50"
+          className={adminButton({ variant: "secondary" })}
         >
           {submitting ? "Salvando..." : "Salvar rascunho"}
         </button>
@@ -549,7 +679,7 @@ export function WorkForm({ initial }: WorkFormProps) {
           onClick={() => handleSubmit("published")}
           disabled={submitting || missingRequired}
           title={missingRequired ? incompleteHint : undefined}
-          className="inline-flex h-[42px] items-center rounded-full bg-cine-yellow px-5 text-sm font-[650] text-cine-text-dark transition-colors hover:bg-cine-yellow-dark disabled:opacity-50"
+          className={adminButton({ variant: "primary" })}
         >
           {submitting ? "Publicando..." : "Enviar para publicação"}
         </button>

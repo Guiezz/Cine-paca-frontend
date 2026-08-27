@@ -6,6 +6,7 @@ import Link from "next/link";
 import { clientApi } from "@/lib/api-client";
 import type { ListEntity } from "@/types/api";
 import { StatusBadge } from "@/components/admin/status-badge";
+import { adminButton } from "@/components/admin/form-controls";
 
 export default function AdminListaDetailPage() {
   const params = useParams();
@@ -56,7 +57,7 @@ export default function AdminListaDetailPage() {
           <StatusBadge status={list.status} />
           <Link
             href={`/admin/listas/${list.id}/editar`}
-            className="inline-flex h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] text-cine-50 transition-colors hover:bg-cine-50/10"
+            className={adminButton({ variant: "secondary", size: "sm" })}
           >
             Editar
           </Link>
@@ -65,7 +66,7 @@ export default function AdminListaDetailPage() {
 
       <p className="max-w-2xl text-base leading-[24.8px] text-cine-200">{list.description}</p>
 
-      <div className="grid grid-cols-[1fr_340px] gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
         <div className="space-y-4">
           <div className="rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6">
             <h2 className="font-heading text-[22px] font-bold tracking-[-0.66px] text-cine-50">

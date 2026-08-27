@@ -35,7 +35,7 @@ export function AdminHeader() {
   }
 
   return (
-    <header className="flex w-full max-w-[1140px] items-center justify-between py-5 mx-auto">
+    <header className="mx-auto flex w-full max-w-[1140px] flex-wrap items-center justify-between gap-3 px-4 py-5 md:px-6 lg:px-0">
       <Link href="/admin/obras" className="flex items-center gap-3">
         <svg width="32" height="39" viewBox="0 0 56 69" fill="none">
           <path
@@ -85,12 +85,12 @@ export function AdminHeader() {
         </div>
       </Link>
 
-      <nav className="flex items-center gap-2 rounded-full border border-[rgba(80,64,107,0.68)] bg-[rgba(42,26,69,0.72)] p-1">
+      <nav className="order-3 flex w-full items-center gap-2 overflow-x-auto rounded-full border border-[rgba(80,64,107,0.68)] bg-[rgba(42,26,69,0.72)] p-1 md:order-none md:w-auto">
         {navItems.map((item) => (
           <Link
             key={item.href}
             href={item.href}
-            className={`flex min-h-[34px] items-center rounded-full px-3.5 text-xs font-[550] tracking-[0.01em] transition-colors ${
+            className={`flex min-h-[34px] shrink-0 items-center rounded-full px-3.5 text-xs font-[550] tracking-[0.01em] transition-colors ${
               isActive(item.href)
                 ? "bg-cine-purple text-cine-50"
                 : "text-cine-200 hover:text-cine-50"

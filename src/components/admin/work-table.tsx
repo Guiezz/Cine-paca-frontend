@@ -2,12 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import type { WorkEntity } from "@/types/api";
 import { StatusBadge } from "@/components/admin/status-badge";
-
-const typeLabels: Record<string, string> = {
-  short: "Curta",
-  documentary: "Documentário",
-  animation: "Animação",
-};
+import { WORK_TYPE_LABELS_SHORT } from "@/lib/labels";
+import { adminButton } from "@/components/admin/form-controls";
 
 function ratingLabel(rating: string) {
   if (rating === "L") return "Livre";
@@ -59,8 +55,8 @@ export function WorkTable({ works }: { works: WorkEntity[] }) {
   }
 
   return (
-    <div className="overflow-hidden rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337]">
-      <table className="w-full text-left text-sm">
+    <div className="overflow-x-auto rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337]">
+      <table className="w-full min-w-[900px] text-left text-sm">
         <thead>
           <tr>
             <th className="w-[363px] px-4 py-3.5 font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light">
@@ -90,14 +86,14 @@ export function WorkTable({ works }: { works: WorkEntity[] }) {
               <tr key={work.id} className="group">
                 <td className="px-4 py-3.5">
                   <div className="grid grid-cols-[94px_1fr] gap-[13px]">
-                    <div className="size-[94px] overflow-hidden rounded-[10px] bg-cine-purple/20">
+                    <div className="aspect-video w-[94px] overflow-hidden rounded-[10px] bg-cine-purple/20">
                       {work.thumbnail_image_url ? (
                         <Image
                           src={work.thumbnail_image_url}
                           alt=""
                           width={94}
-                          height={67}
-                          className="h-[67px] w-full object-cover"
+                          height={53}
+                          className="h-full w-full object-cover"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center text-[10px] text-cine-300">
@@ -112,7 +108,7 @@ export function WorkTable({ works }: { works: WorkEntity[] }) {
                         </p>
                       </div>
                       <p className="text-[13px] leading-[18.2px] text-cine-200">
-                        {typeLabels[work.type] ?? work.type}{work.duration_minutes ? ` · ${work.duration_minutes} min` : ""}
+                        {WORK_TYPE_LABELS_SHORT[work.type] ?? work.type}{work.duration_minutes ? ` · ${work.duration_minutes} min` : ""}
                       </p>
                     </div>
                   </div>
@@ -151,13 +147,13 @@ export function WorkTable({ works }: { works: WorkEntity[] }) {
                   <div className="flex items-center justify-end gap-[8px]">
                     <Link
                       href={`/admin/obras/${work.id}`}
-                      className="inline-flex min-h-[42px] items-center justify-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] tracking-[0.01em] text-cine-50 transition-colors hover:bg-cine-50/10"
+                      className={adminButton({ variant: "secondary", size: "sm" })}
                     >
                       Ver
                     </Link>
                     <Link
                       href={`/admin/obras/${work.id}/editar`}
-                      className="inline-flex min-h-[42px] items-center justify-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] tracking-[0.01em] text-cine-50 transition-colors hover:bg-cine-50/10"
+                      className={adminButton({ variant: "secondary", size: "sm" })}
                     >
                       Editar
                     </Link>

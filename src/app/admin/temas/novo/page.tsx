@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { clientApi } from "@/lib/api-client";
 import type { ThemeEntity } from "@/types/api";
+import { adminButton, adminInput, adminLabel } from "@/components/admin/form-controls";
 
 export default function AdminTemaNovoPage() {
   const router = useRouter();
@@ -34,21 +35,21 @@ export default function AdminTemaNovoPage() {
             TAXONOMIA
           </span>
         </div>
-        <h1 className="font-heading text-[58px] font-bold leading-[59.74px] tracking-[-1.74px] text-cine-50">
+        <h1 className="font-heading text-3xl md:text-5xl lg:text-[58px] font-bold leading-tight lg:leading-[59.74px] tracking-tight lg:tracking-[-1.74px] text-cine-50">
           Novo tema
         </h1>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
         <div>
-          <label className="block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light">
+          <label className={adminLabel()}>
             Nome
           </label>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Ex: Emoções"
-            className="mt-1 h-[44px] w-full rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
+            className={`mt-1 ${adminInput()}`}
           />
         </div>
 
@@ -62,14 +63,14 @@ export default function AdminTemaNovoPage() {
           <button
             type="button"
             onClick={() => router.push("/admin/temas")}
-            className="inline-flex h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-5 text-sm font-[650] text-cine-50 transition-colors hover:bg-cine-50/10"
+            className={adminButton({ variant: "secondary" })}
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={submitting || !name.trim()}
-            className="inline-flex h-[42px] items-center rounded-full bg-cine-yellow px-5 text-sm font-[650] text-cine-text-dark transition-colors hover:bg-cine-yellow-dark disabled:opacity-50"
+            className={adminButton({ variant: "primary" })}
           >
             {submitting ? "Salvando..." : "Salvar"}
           </button>

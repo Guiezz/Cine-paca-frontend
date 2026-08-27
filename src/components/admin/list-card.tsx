@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import type { ListEntity } from "@/types/api";
+import { adminButton } from "@/components/admin/form-controls";
 
 const statusConfig: Record<string, { label: string; color: string }> = {
   published: { label: "PUBLICADA", color: "text-cine-yellow-light" },
@@ -82,7 +83,7 @@ export function ListCard({ list }: { list: ListEntity }) {
           </Link>
           <Link
             href={`/admin/listas/${list.id}/editar`}
-            className="inline-flex min-h-[42px] flex-1 items-center justify-center rounded-full border border-[rgba(248,245,239,0.22)] text-[13px] font-[650] tracking-[0.01em] text-cine-50 transition-colors hover:bg-cine-50/10"
+            className={adminButton({ variant: "secondary", size: "sm", className: "flex-1" })}
           >
             {list.status === "published" ? "Editar" : list.status === "draft" ? "Prévia" : "Prévia"}
           </Link>

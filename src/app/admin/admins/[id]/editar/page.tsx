@@ -11,6 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { ADMIN_STATUS_LABELS } from "@/lib/labels";
+import { adminButton, adminInput, adminLabel, adminSelectTrigger } from "@/components/admin/form-controls";
 
 export default function AdminAdminEditarPage() {
   const router = useRouter();
@@ -22,10 +24,8 @@ export default function AdminAdminEditarPage() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const inputClass =
-    "h-[44px] w-full rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow";
-  const selectClass =
-    "h-[44px] rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-sm text-cine-50";
+  const inputClass = adminInput();
+  const selectClass = adminSelectTrigger();
 
   useEffect(() => {
     clientApi.get<AdminEntity>(`/api/admin/admins/${params.id}`).then((res) => {
@@ -71,24 +71,24 @@ export default function AdminAdminEditarPage() {
             ADMINISTRAÇÃO
           </span>
         </div>
-        <h1 className="font-heading text-[58px] font-bold leading-[59.74px] tracking-[-1.74px] text-cine-50">
+        <h1 className="font-heading text-3xl md:text-5xl lg:text-[58px] font-bold leading-tight lg:leading-[59.74px] tracking-tight lg:tracking-[-1.74px] text-cine-50">
           Editar admin
         </h1>
       </div>
 
       <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
         <div>
-          <label className="block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light">
+          <label className={adminLabel()}>
             Nome
           </label>
           <input value={name} onChange={(e) => setName(e.target.value)} className={inputClass} />
         </div>
 
         <div>
-          <label className="block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light">
+          <label className={adminLabel()}>
             Status
           </label>
-          <Select value={status} onValueChange={(v) => setStatus(v ?? "active")}>
+          <Select items={ADMIN_STATUS_LABELS} value={status} onValueChange={(v) => setStatus(v ?? "active")}>
             <SelectTrigger className={selectClass}>
               <SelectValue />
             </SelectTrigger>
@@ -100,7 +100,7 @@ export default function AdminAdminEditarPage() {
         </div>
 
         <div>
-          <label className="block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light">
+          <label className={adminLabel()}>
             Nova senha (opcional)
           </label>
           <input
@@ -122,14 +122,14 @@ export default function AdminAdminEditarPage() {
           <button
             type="button"
             onClick={() => router.push("/admin/admins")}
-            className="inline-flex h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-5 text-sm font-[650] text-cine-50 transition-colors hover:bg-cine-50/10"
+            className={adminButton({ variant: "secondary" })}
           >
             Cancelar
           </button>
           <button
             type="submit"
             disabled={submitting || !name.trim()}
-            className="inline-flex h-[42px] items-center rounded-full bg-cine-yellow px-5 text-sm font-[650] text-cine-text-dark transition-colors hover:bg-cine-yellow-dark disabled:opacity-50"
+            className={adminButton({ variant: "primary" })}
           >
             {submitting ? "Salvando..." : "Salvar"}
           </button>
