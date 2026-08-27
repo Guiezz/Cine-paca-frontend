@@ -59,7 +59,14 @@ export function WorkForm({ initial }: WorkFormProps) {
   const [thumbnailUrl, setThumbnailUrl] = useState(
     initial?.thumbnail_image_url ?? "",
   );
+  const [heroImageUrl, setHeroImageUrl] = useState(initial?.hero_image_url ?? "");
   const [videoUrl, setVideoUrl] = useState(initial?.external_video_url ?? "");
+
+  const [director, setDirector] = useState(initial?.director ?? "");
+  const [producer, setProducer] = useState(initial?.producer ?? "");
+  const [country, setCountry] = useState(initial?.country ?? "");
+  const [language, setLanguage] = useState(initial?.language ?? "");
+  const [ageRange, setAgeRange] = useState(initial?.age_range ?? "");
   const [pedagogicalUse, setPedagogicalUse] = useState(
     initial?.pedagogical_use ?? "",
   );
@@ -144,8 +151,14 @@ export function WorkForm({ initial }: WorkFormProps) {
         short_description: shortDescription || undefined,
         synopsis: shortDescription,
         stage: stage || undefined,
+        age_range: ageRange || undefined,
         thumbnail_image_url: thumbnailUrl || undefined,
+        hero_image_url: heroImageUrl || undefined,
         external_video_url: videoUrl || undefined,
+        director: director || undefined,
+        producer: producer || undefined,
+        country: country || undefined,
+        language: language || undefined,
         pedagogical_use: pedagogicalUse || undefined,
         trigger_question: triggerQuestion || undefined,
         theme_ids: themeIds.length > 0 ? themeIds : undefined,
@@ -187,8 +200,9 @@ export function WorkForm({ initial }: WorkFormProps) {
   }
 
   const snapshot = JSON.stringify([
-    title, type, duration, year, rating, shortDescription, stage,
-    thumbnailUrl, videoUrl, pedagogicalUse, triggerQuestion,
+    title, type, duration, year, rating, shortDescription, stage, ageRange,
+    thumbnailUrl, heroImageUrl, videoUrl, pedagogicalUse, triggerQuestion,
+    director, producer, country, language,
     themes.map((t) => t.name), bnccSkills.map((s) => s.id),
   ]);
   // useState com valor inicial guarda o retrato do primeiro render; ler um
@@ -349,7 +363,73 @@ export function WorkForm({ initial }: WorkFormProps) {
             </div>
           </div>
 
-          {/* Seção 2: Imagens e exibição */}
+          {/* Seção 2: Ficha técnica */}
+          <div className="mt-8 border-t border-[rgba(80,64,107,0.74)] pt-8">
+            <div className="flex items-center gap-4">
+              <h2 className="font-heading text-[22px] font-bold tracking-[-0.66px] text-cine-50">
+                Ficha técnica
+              </h2>
+              <div className="flex-1 border-t border-[rgba(80,64,107,0.74)]" />
+            </div>
+
+            <div className="mt-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="obra-diretor" className={labelClass}>
+                    Direção
+                  </label>
+                  <input
+                    id="obra-diretor"
+                    value={director}
+                    onChange={(e) => setDirector(e.target.value)}
+                    placeholder="Ex: Ana Rodrigues"
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="obra-producao" className={labelClass}>
+                    Produção
+                  </label>
+                  <input
+                    id="obra-producao"
+                    value={producer}
+                    onChange={(e) => setProducer(e.target.value)}
+                    placeholder="Ex: Curta Coletivo"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label htmlFor="obra-pais" className={labelClass}>
+                    País
+                  </label>
+                  <input
+                    id="obra-pais"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    placeholder="Ex: Brasil"
+                    className={inputClass}
+                  />
+                </div>
+                <div>
+                  <label htmlFor="obra-idioma" className={labelClass}>
+                    Idioma
+                  </label>
+                  <input
+                    id="obra-idioma"
+                    value={language}
+                    onChange={(e) => setLanguage(e.target.value)}
+                    placeholder="Ex: Português"
+                    className={inputClass}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Seção 3: Imagens e exibição */}
           <div className="mt-8 border-t border-[rgba(80,64,107,0.74)] pt-8">
             <div className="flex items-center gap-4">
               <h2 className="font-heading text-[22px] font-bold tracking-[-0.66px] text-cine-50">
@@ -358,16 +438,34 @@ export function WorkForm({ initial }: WorkFormProps) {
               <div className="flex-1 border-t border-[rgba(80,64,107,0.74)]" />
             </div>
 
-            <div className="mt-5">
-              <ImageUpload
-                value={thumbnailUrl}
-                onChange={setThumbnailUrl}
-                label="Clique para enviar a capa do curta"
-              />
-              <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
-                Use um frame real da obra em proporção 16:9 — é assim que ela
-                aparece nos cards do acervo.
-              </p>
+            <div className="mt-5 grid grid-cols-2 gap-4">
+              <div>
+                <span className={labelClass}>Capa</span>
+                <div className="mt-1.5">
+                  <ImageUpload
+                    value={thumbnailUrl}
+                    onChange={setThumbnailUrl}
+                    label="Clique para enviar a capa do curta"
+                  />
+                </div>
+                <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
+                  Use um frame real da obra em proporção 16:9 — é assim que ela
+                  aparece nos cards do acervo.
+                </p>
+              </div>
+              <div>
+                <span className={labelClass}>Imagem de destaque</span>
+                <div className="mt-1.5">
+                  <ImageUpload
+                    value={heroImageUrl}
+                    onChange={setHeroImageUrl}
+                    label="Clique para enviar a imagem de destaque"
+                  />
+                </div>
+                <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
+                  Abre a página da obra. Se ficar vazia, a capa é usada no lugar.
+                </p>
+              </div>
             </div>
 
             <div className="mt-4">
@@ -385,7 +483,7 @@ export function WorkForm({ initial }: WorkFormProps) {
             </div>
           </div>
 
-          {/* Seção 3: Curadoria pedagógica */}
+          {/* Seção 4: Curadoria pedagógica */}
           <div className="mt-8 border-t border-[rgba(80,64,107,0.74)] pt-8">
             <div className="flex items-center gap-4">
               <h2 className="font-heading text-[22px] font-bold tracking-[-0.66px] text-cine-50">
@@ -469,18 +567,36 @@ export function WorkForm({ initial }: WorkFormProps) {
                   </Select>
                 </div>
                 <div>
-                  <label htmlFor="obra-bncc" className={labelClass}>
-                    Habilidades BNCC
+                  <label htmlFor="obra-faixa" className={labelClass}>
+                    Faixa etária
                   </label>
-                  <div className="mt-1.5">
-                    <BnccSkillsSelector
-                      inputId="obra-bncc"
-                      stage={stage}
-                      selected={bnccSkills}
-                      onAdd={addBnccSkill}
-                      onRemove={removeBnccSkill}
-                    />
-                  </div>
+                  <input
+                    id="obra-faixa"
+                    value={ageRange}
+                    onChange={(e) => setAgeRange(e.target.value)}
+                    placeholder="Ex: 6 a 10 anos"
+                    aria-describedby="obra-faixa-ajuda"
+                    className={inputClass}
+                  />
+                  <p id="obra-faixa-ajuda" className="mt-1 text-xs text-cine-300">
+                    A página da obra exibe como &quot;Indicado para ...&quot;. É
+                    diferente da classificação indicativa.
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <label htmlFor="obra-bncc" className={labelClass}>
+                  Habilidades BNCC
+                </label>
+                <div className="mt-1.5">
+                  <BnccSkillsSelector
+                    inputId="obra-bncc"
+                    stage={stage}
+                    selected={bnccSkills}
+                    onAdd={addBnccSkill}
+                    onRemove={removeBnccSkill}
+                  />
                 </div>
               </div>
 
