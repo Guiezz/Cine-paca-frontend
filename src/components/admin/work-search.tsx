@@ -44,6 +44,11 @@ export function WorkSearch({ onAdd, addedIds }: WorkSearchProps) {
       <div className="relative">
         <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-cine-300" />
         <input
+          id="lista-busca-obras"
+          // Dentro de um <form>, Enter aqui submeteria a lista inteira.
+          onKeyDown={(e) => {
+            if (e.key === "Enter") e.preventDefault();
+          }}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Filtrar obras por título ou tema..."

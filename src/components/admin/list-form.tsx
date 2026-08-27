@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clientApi } from "@/lib/api-client";
-import type { ListEntity, WorkEntity } from "@/types/api";
+import type { ListEntity, ThemeEntity, WorkEntity } from "@/types/api";
+import { STAGE_OPTIONS } from "@/lib/stages";
 import { TagInput } from "@/components/admin/tag-input";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { WorkSearch } from "@/components/admin/work-search";
@@ -100,6 +101,18 @@ export function ListForm({ initial }: ListFormProps) {
     });
   }
 
+  function reorder(from: number, to: number) {
+    setOrderedItems((prev) => {
+      if (from === to || from < 0 || to < 0 || from >= prev.length || to >= prev.length) {
+        return prev;
+      }
+      const next = [...prev];
+      const [moved] = next.splice(from, 1);
+      next.splice(to, 0, moved);
+      return next;
+    });
+  }
+
   const totalDuration = orderedItems.reduce((acc, i) => acc + (i.work.duration_minutes || 0), 0);
 
   function formatApiError(res: { error: string; details?: unknown }): string {
@@ -112,49 +125,95 @@ export function ListForm({ initial }: ListFormProps) {
     return msg;
   }
 
+  /**
+   * Sincroniza os itens preservando o maior prefixo que já está correto.
+   * Antes isto apagava todos os itens e recriava do zero, então uma falha no
+   * meio deixava a curadoria mutilada. Agora uma lista inalterada não dispara
+   * nenhuma escrita, e qualquer erro aborta nomeando a obra afetada.
+   */
+  async function syncItems(listId: string) {
+    const existing = initial?.items ?? [];
+
+    let keep = 0;
+    while (
+      keep < existing.length &&
+      keep < orderedItems.length &&
+      existing[keep].work.id === orderedItems[keep].work.id &&
+      (existing[keep].admin_comment ?? "") === (orderedItems[keep].comment ?? "")
+    ) {
+      keep++;
+    }
+
+    for (let i = existing.length - 1; i >= keep; i--) {
+      const res = await clientApi.delete(
+        `/api/admin/lists/${listId}/items/${existing[i].id}`,
+      );
+      // 404 = item já removido numa tentativa anterior; retentar tem que passar.
+      if (!res.ok && res.status !== 404) {
+        throw new Error(
+          `Erro ao remover "${existing[i].work.title}" da lista: ${res.error}`,
+        );
+      }
+    }
+
+    for (let i = keep; i < orderedItems.length; i++) {
+      const item = orderedItems[i];
+      const res = await clientApi.post(`/api/admin/lists/${listId}/items`, {
+        work_id: item.work.id,
+        admin_comment: item.comment || undefined,
+      });
+      if (!res.ok) {
+        throw new Error(
+          `Erro ao adicionar "${item.work.title}" na posição ${i + 1}: ${res.error}`,
+        );
+      }
+    }
+  }
+
   async function handleSubmit(publish?: boolean) {
     setError(null);
     setSubmitting(true);
 
     try {
+      const themeIds: string[] = [];
+      for (const theme of themes) {
+        if (theme.id.startsWith("new-")) {
+          const res = await clientApi.post<ThemeEntity>("/api/admin/themes", {
+            name: theme.name,
+          });
+          if (!res.ok) throw new Error(`Erro ao criar tema "${theme.name}": ${res.error}`);
+          themeIds.push(res.data.id);
+        } else {
+          themeIds.push(theme.id);
+        }
+      }
+
+      const payload = {
+        title,
+        description,
+        stage: stage || undefined,
+        cover_image_url: coverImageUrl || undefined,
+        admin_note: adminNote || undefined,
+        theme_ids: themeIds,
+      };
+
       let listId = initial?.id;
 
       if (initial) {
-        const res = await clientApi.patch<ListEntity>(`/api/admin/lists/${initial.id}`, {
-          title,
-          description,
-          stage: stage || undefined,
-          cover_image_url: coverImageUrl || undefined,
-          admin_note: adminNote || undefined,
-        });
+        const res = await clientApi.patch<ListEntity>(
+          `/api/admin/lists/${initial.id}`,
+          payload,
+        );
         if (!res.ok) throw new Error(formatApiError(res));
         listId = initial.id;
       } else {
-        const res = await clientApi.post<ListEntity>("/api/admin/lists", {
-          title,
-          description,
-          stage: stage || undefined,
-          cover_image_url: coverImageUrl || undefined,
-          admin_note: adminNote || undefined,
-        });
+        const res = await clientApi.post<ListEntity>("/api/admin/lists", payload);
         if (!res.ok) throw new Error(formatApiError(res));
         listId = res.data.id;
       }
 
       if (listId) {
-        if (initial) {
-          for (const item of initial.items ?? []) {
-            await clientApi.delete(`/api/admin/lists/${listId}/items/${item.id}`);
-          }
-        }
-
-        for (const item of orderedItems) {
-          const res = await clientApi.post(`/api/admin/lists/${listId}/items`, {
-            work_id: item.work.id,
-            admin_comment: item.comment || undefined,
-          });
-          if (!res.ok) throw new Error(`Erro ao adicionar "${item.work.title}": ${res.error}`);
-        }
+        await syncItems(listId);
 
         if (publish) {
           const pubRes = await clientApi.post(`/api/admin/lists/${listId}/publish`);
@@ -170,17 +229,43 @@ export function ListForm({ initial }: ListFormProps) {
     }
   }
 
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (error) errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [error]);
+
+  // A API exige title e description em qualquer POST/PATCH de lista.
+  const missingRequired = !title.trim() || !description.trim();
+  const incompleteHint = "Preencha título e descrição curatorial para salvar.";
+  // Publicar uma curadoria vazia não faz sentido para o professor.
+  const cannotPublish = missingRequired || orderedItems.length === 0;
+  const publishHint = missingRequired
+    ? incompleteHint
+    : "Adicione ao menos uma obra para publicar a lista.";
+
   const inputClass =
     "h-[44px] w-full rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow";
   const labelClass =
     "block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light";
+  const required = (
+    <span className="ml-1 text-destructive" title="Campo obrigatório">
+      *<span className="sr-only"> (obrigatório)</span>
+    </span>
+  );
   const selectClass =
     "h-[44px] rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-base text-cine-50";
 
   const isEditing = !!initial;
 
   return (
-    <div className="flex flex-col gap-[22px]">
+    <form
+      noValidate
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!submitting && !missingRequired) handleSubmit(false);
+      }}
+      className="flex flex-col gap-[22px]"
+    >
       <div className="flex gap-[22px]">
         <div className="w-[508px] shrink-0 rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6">
           <div className="flex items-center gap-3">
@@ -192,61 +277,78 @@ export function ListForm({ initial }: ListFormProps) {
 
           <div className="mt-4 space-y-[14px]">
             <div>
-              <label className={labelClass}>IMAGEM DE CAPA</label>
+              <label className={labelClass}>Imagem de capa</label>
               <div className="mt-1.5">
                 <ImageUpload value={coverImageUrl} onChange={setCoverImageUrl} label="Clique para enviar capa da lista" />
               </div>
             </div>
 
             <div>
-              <label className={labelClass}>TÍTULO DA LISTA</label>
+              <label htmlFor="lista-titulo" className={labelClass}>
+                Título da lista{required}
+              </label>
               <input
+                id="lista-titulo"
+                required
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder="Infâncias, imaginação e escuta"
+                placeholder="Ex: Infâncias, imaginação e escuta"
                 className={inputClass}
               />
             </div>
 
             <div>
-              <label className={labelClass}>PÚBLICO INDICADO</label>
+              <label id="lista-etapa-label" className={labelClass}>
+                Público indicado
+              </label>
               <Select value={stage} onValueChange={(v) => setStage(v ?? "")}>
-                <SelectTrigger className={selectClass}>
+                <SelectTrigger aria-labelledby="lista-etapa-label" className={selectClass}>
                   <SelectValue placeholder="Selecionar etapa" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Educação Infantil">Educação Infantil</SelectItem>
-                  <SelectItem value="Anos iniciais">Anos iniciais</SelectItem>
-                  <SelectItem value="Anos finais">Anos finais</SelectItem>
-                  <SelectItem value="Ensino Médio">Ensino Médio</SelectItem>
+                  {STAGE_OPTIONS.map((option) => (
+                    <SelectItem key={option} value={option}>
+                      {option}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
 
             <div>
-              <label className={labelClass}>DESCRIÇÃO CURATORIAL</label>
+              <label htmlFor="lista-descricao" className={labelClass}>
+                Descrição curatorial{required}
+              </label>
               <textarea
+                id="lista-descricao"
+                required
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Descreva o propósito pedagógico da lista..."
+                placeholder="Ex: Três curtas para abrir conversa sobre escuta e convivência nos anos iniciais."
                 className="h-[116px] w-full resize-none rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
               />
             </div>
 
             <div>
-              <label className={labelClass}>OBSERVAÇÕES DO CURADOR</label>
+              <label htmlFor="lista-observacoes" className={labelClass}>
+                Observações do curador
+              </label>
               <textarea
+                id="lista-observacoes"
                 value={adminNote}
                 onChange={(e) => setAdminNote(e.target.value)}
-                placeholder="Instruções, observações e contexto para professores usarem a lista..."
+                placeholder="Ex: Assistir na ordem. Reservar 10 min ao fim de cada obra para a roda de conversa."
                 className="h-[180px] w-full resize-none rounded-[12px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-3 text-base text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
               />
             </div>
 
             <div>
-              <label className={labelClass}>TEMAS PRINCIPAIS</label>
+              <label htmlFor="lista-temas" className={labelClass}>
+                Temas principais
+              </label>
               <div className="mt-1.5">
                 <TagInput
+                  inputId="lista-temas"
                   tags={themes}
                   onAdd={addTheme}
                   onRemove={removeTheme}
@@ -269,9 +371,17 @@ export function ListForm({ initial }: ListFormProps) {
             )}
 
             {error && (
-              <div className="whitespace-pre-wrap rounded-[10px] border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              <div
+                ref={errorRef}
+                role="alert"
+                className="whitespace-pre-wrap rounded-[10px] border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+              >
                 {error}
               </div>
+            )}
+
+            {cannotPublish && !error && (
+              <p className="text-right text-xs text-cine-300">{publishHint}</p>
             )}
 
             <div className="flex justify-end gap-[10px] pt-1">
@@ -283,9 +393,9 @@ export function ListForm({ initial }: ListFormProps) {
                 {isEditing ? "Descartar alterações" : "Descartar"}
               </button>
               <button
-                type="button"
-                onClick={() => handleSubmit(false)}
-                disabled={submitting}
+                type="submit"
+                disabled={submitting || missingRequired}
+                title={missingRequired ? incompleteHint : undefined}
                 className="inline-flex min-h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-4 text-[13px] font-[650] text-cine-50 transition-colors hover:bg-cine-50/10 disabled:opacity-50"
               >
                 {submitting ? "Salvando..." : "Salvar rascunho"}
@@ -293,7 +403,8 @@ export function ListForm({ initial }: ListFormProps) {
               <button
                 type="button"
                 onClick={() => handleSubmit(true)}
-                disabled={submitting}
+                disabled={submitting || cannotPublish}
+                title={cannotPublish ? publishHint : undefined}
                 className="inline-flex min-h-[42px] items-center rounded-full bg-cine-yellow px-4 text-[13px] font-[650] text-cine-text-dark transition-colors hover:bg-cine-yellow-dark disabled:opacity-50"
               >
                 {submitting ? "Publicando..." : "Publicar lista"}
@@ -322,12 +433,14 @@ export function ListForm({ initial }: ListFormProps) {
           </div>
 
           <p className="mt-1 text-[13px] leading-[18.85px] text-cine-200">
-            Arraste os itens pela alça para reorganizar a sequência sugerida da lista.
+            Arraste pela alça para reorganizar a sequência, ou use as setas de cada
+            item para mover pelo teclado.
           </p>
 
           <div className="mt-1">
             <OrderedList
               items={orderedItems}
+              onReorder={reorder}
               onRemove={removeWork}
               onComment={updateComment}
               onMoveUp={moveUp}
@@ -336,6 +449,6 @@ export function ListForm({ initial }: ListFormProps) {
           </div>
         </div>
       </div>
-    </div>
+    </form>
   );
 }
