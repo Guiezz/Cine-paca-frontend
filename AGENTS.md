@@ -16,17 +16,19 @@ This version has breaking changes — APIs, conventions, and file structure may 
 ## Project Structure
 - `src/app/(public)/` — public pages (home, /obras, /curadorias, /obras/[slug], /curadorias/[slug])
 - `src/app/admin/` — admin pages (works CRUD, lists/themes/skills management)
-- `src/app/api/` — Next.js API proxy routes (wraps backend API)
 - `src/components/public/` — public components (ObraCard, search-filters, etc.)
 - `src/components/admin/` — admin components (work-form, list-form, etc.)
 - `src/lib/` — utilities (api.ts client, services.ts, utils.ts)
 - `src/types/api.ts` — TypeScript types for API entities
 
 ## API Patterns
-- **Two clients**: `@/lib/api` (server-side fetch) and `@/lib/api-client` (client-side via Next.js API routes at `/api/**`)
+- **Two clients**: `@/lib/api` (server-side fetch) and `@/lib/api-client` (client-side, baseUrl `""`)
+- There are **no** route handlers under `src/app/api/`. Client calls to `/api/**` reach the
+  backend through the `rewrites()` rule in `next.config.ts`, not through a proxy route.
 - **Entity types** in `@/types/api`: WorkEntity, ListEntity, ThemeEntity, BnccSkillEntity
 - **Filter values** use API display strings, not slugs:
-  - Stage: `"Anos iniciais"`, `"Ensino Fundamental"`, `"Educação Infantil"`, `"Ensino médio"`
+  - Stage: single source of truth is `STAGE_OPTIONS` in `@/lib/stages` — the public filters
+    compare by exact equality, so acentuação e caixa precisam bater
   - Type: `"short"`, `"documentary"`, `"animation"` (NOT `"short_film"`, `"feature_film"`, `"series"`)
   - Lists API does NOT support `stage` filter — filtering is done client-side
   - `pedagogical_use` is NOT a supported API filter — returns 400

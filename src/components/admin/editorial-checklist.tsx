@@ -37,6 +37,10 @@ export function EditorialChecklist({ checked, onToggle }: EditorialChecklistProp
       <h2 className="font-heading text-[22px] font-bold tracking-[-0.66px] text-cine-50">
         Checklist editorial
       </h2>
+      <p className="mt-1 text-xs leading-[16.8px] text-cine-300">
+        Apoio de conferência para esta sessão. As marcações não são salvas com a
+        obra nem ficam visíveis para outros curadores.
+      </p>
       <div className="mt-5 space-y-4">
         {checklistItems.map((item) => (
           <label

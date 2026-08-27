@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { clientApi } from "@/lib/api-client";
 import type {
@@ -9,6 +9,7 @@ import type {
   ThemeEntity,
   BnccSkillEntity,
 } from "@/types/api";
+import { STAGE_OPTIONS } from "@/lib/stages";
 import { TagInput } from "@/components/admin/tag-input";
 import { EditorialChecklist } from "@/components/admin/editorial-checklist";
 import { ImageUpload } from "@/components/admin/image-upload";
@@ -27,13 +28,9 @@ const workTypeLabels: Record<string, string> = {
   animation: "Animação",
 };
 
-const stageLabels: Record<string, string> = {
-  "Anos iniciais": "Anos iniciais",
-  "Anos finais": "Anos finais",
-  "Ensino Fundamental": "Ensino Fundamental",
-  "Educação Infantil": "Educação Infantil",
-  "Ensino médio": "Ensino médio",
-};
+// Limite só de orientação: acima disto o texto começa a ser cortado nos cards.
+// Não é imposto como maxLength para não truncar sinopse já cadastrada.
+const SYNOPSIS_SOFT_LIMIT = 280;
 
 const ratingLabels: Record<string, string> = {
   L: "Livre",
@@ -129,6 +126,18 @@ export function WorkForm({ initial }: WorkFormProps) {
     setSubmitting(true);
 
     try {
+      // `Number("12 min")` é NaN, que o JSON.stringify manda como null e o
+      // backend rejeita com uma mensagem em inglês. Parseia e valida aqui.
+      const durationMinutes = Number.parseInt(duration, 10);
+      if (!Number.isFinite(durationMinutes) || durationMinutes <= 0) {
+        throw new Error("Informe a duração da obra em minutos (ex: 12).");
+      }
+
+      const releaseYear = year.trim() ? Number.parseInt(year, 10) : undefined;
+      if (releaseYear !== undefined && !Number.isFinite(releaseYear)) {
+        throw new Error("Ano de lançamento inválido. Use quatro dígitos (ex: 2024).");
+      }
+
       const themeIds: string[] = [];
       for (const theme of themes) {
         if (theme.id.startsWith("new-")) {
@@ -146,8 +155,8 @@ export function WorkForm({ initial }: WorkFormProps) {
       const payload: CreateWorkDto = {
         title,
         type: type as CreateWorkDto["type"],
-        duration_minutes: Number(duration),
-        release_year: year ? Number(year) : undefined,
+        duration_minutes: durationMinutes,
+        release_year: releaseYear,
         rating: rating as CreateWorkDto["rating"],
         short_description: shortDescription || undefined,
         synopsis: shortDescription,
@@ -194,17 +203,44 @@ export function WorkForm({ initial }: WorkFormProps) {
     }
   }
 
+  // O bloco de erro fica no rodapé; sem isto o usuário clica em publicar numa
+  // tela alta e nada parece ter acontecido.
+  const errorRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (error) errorRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [error]);
+
+  // Mínimo que a API exige em qualquer POST/PATCH de obra (title, synopsis,
+  // type, duration_minutes, rating) — type e rating já têm valor padrão.
+  const missingRequired =
+    !title.trim() || !duration.trim() || !shortDescription.trim();
+  const incompleteHint =
+    "Preencha título, duração e sinopse curta para salvar.";
+  const synopsisTooLong = shortDescription.length > SYNOPSIS_SOFT_LIMIT;
+
   const inputClass =
     "h-[44px] w-full rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow";
   const labelClass =
     "block font-mono text-[11px] font-semibold uppercase tracking-[0.08em] text-cine-yellow-light";
+  const required = (
+    <span className="ml-1 text-destructive" title="Campo obrigatório">
+      *<span className="sr-only"> (obrigatório)</span>
+    </span>
+  );
   const selectClass =
     "h-[44px] rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 text-sm text-cine-50";
 
   const isEditing = !!initial;
 
   return (
-    <div className="flex flex-col gap-[18px]">
+    <form
+      noValidate
+      onSubmit={(e) => {
+        e.preventDefault();
+        if (!submitting && !missingRequired) handleSubmit("draft");
+      }}
+      className="flex flex-col gap-[18px]"
+    >
       <div className="grid grid-cols-[1fr_340px] gap-[18px]">
         <div className="rounded-[18px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-6">
           {/* Seção 1: Identificação da obra */}
@@ -218,23 +254,29 @@ export function WorkForm({ initial }: WorkFormProps) {
 
             <div className="mt-5 space-y-4">
               <div>
-                <label className={labelClass}>Título</label>
+                <label htmlFor="obra-titulo" className={labelClass}>
+                  Título{required}
+                </label>
                 <input
+                  id="obra-titulo"
+                  required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder="O menino que engoliu o choro"
+                  placeholder="Ex: O menino que engoliu o choro"
                   className={inputClass}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Tipo</label>
+                  <label id="obra-tipo-label" className={labelClass}>
+                    Tipo
+                  </label>
                   <Select
                     value={type}
                     onValueChange={(v) => setType(v ?? "short")}
                   >
-                    <SelectTrigger className={selectClass}>
+                    <SelectTrigger aria-labelledby="obra-tipo-label" className={selectClass}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -247,11 +289,16 @@ export function WorkForm({ initial }: WorkFormProps) {
                   </Select>
                 </div>
                 <div>
-                  <label className={labelClass}>Duração</label>
+                  <label htmlFor="obra-duracao" className={labelClass}>
+                    Duração (minutos){required}
+                  </label>
                   <input
+                    id="obra-duracao"
+                    required
                     value={duration}
                     onChange={(e) => setDuration(e.target.value)}
-                    placeholder="12 min"
+                    inputMode="numeric"
+                    placeholder="Ex: 12"
                     className={inputClass}
                   />
                 </div>
@@ -259,21 +306,27 @@ export function WorkForm({ initial }: WorkFormProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Ano</label>
+                  <label htmlFor="obra-ano" className={labelClass}>
+                    Ano de lançamento
+                  </label>
                   <input
+                    id="obra-ano"
                     value={year}
                     onChange={(e) => setYear(e.target.value)}
-                    placeholder="2024"
+                    inputMode="numeric"
+                    placeholder="Ex: 2024"
                     className={inputClass}
                   />
                 </div>
                 <div>
-                  <label className={labelClass}>Classificação indicativa</label>
+                  <label id="obra-rating-label" className={labelClass}>
+                    Classificação indicativa
+                  </label>
                   <Select
                     value={rating}
                     onValueChange={(v) => setRating(v ?? "L")}
                   >
-                    <SelectTrigger className={selectClass}>
+                    <SelectTrigger aria-labelledby="obra-rating-label" className={selectClass}>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -298,25 +351,28 @@ export function WorkForm({ initial }: WorkFormProps) {
               <div className="flex-1 border-t border-[rgba(80,64,107,0.74)]" />
             </div>
 
-            <div className="mt-5 grid grid-cols-2 gap-4">
-              <div className="flex h-[200px] items-center justify-center rounded-[16px] border-2 border-dashed border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)]">
-                <p className="px-6 text-center text-sm text-cine-300">
-                  Enviar vídeo ou link incorporado
-                </p>
-              </div>
+            <div className="mt-5">
               <ImageUpload
                 value={thumbnailUrl}
                 onChange={setThumbnailUrl}
                 label="Clique para enviar a capa do curta"
               />
+              <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
+                Use um frame real da obra em proporção 16:9 — é assim que ela
+                aparece nos cards do acervo.
+              </p>
             </div>
 
             <div className="mt-4">
-              <label className={labelClass}>URL de exibição</label>
+              <label htmlFor="obra-video" className={labelClass}>
+                URL de exibição
+              </label>
               <input
+                id="obra-video"
+                type="url"
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
-                placeholder="https://..."
+                placeholder="Ex: https://www.youtube.com/watch?v=..."
                 className={inputClass}
               />
             </div>
@@ -333,28 +389,49 @@ export function WorkForm({ initial }: WorkFormProps) {
 
             <div className="mt-5 space-y-4">
               <div>
-                <label className={labelClass}>Sinopse curta</label>
+                <label htmlFor="obra-sinopse" className={labelClass}>
+                  Sinopse curta{required}
+                </label>
                 <textarea
+                  id="obra-sinopse"
+                  required
                   value={shortDescription}
                   onChange={(e) => setShortDescription(e.target.value)}
-                  placeholder="Escreva uma sinopse breve da obra..."
+                  placeholder="Ex: Um menino descobre que guardar o choro tem peso, e aprende a dividi-lo."
+                  aria-describedby="obra-sinopse-ajuda"
                   className="h-[112px] w-full resize-none rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-2 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
                 />
+                <div
+                  id="obra-sinopse-ajuda"
+                  className="mt-1 flex items-baseline justify-between gap-3 text-xs text-cine-300"
+                >
+                  <span>Aparece nos cards do acervo e na página da obra.</span>
+                  <span className={synopsisTooLong ? "text-cine-yellow" : undefined}>
+                    {shortDescription.length}
+                    {synopsisTooLong && ` · passa de ${SYNOPSIS_SOFT_LIMIT}, o card vai cortar`}
+                  </span>
+                </div>
               </div>
 
               <div>
-                <label className={labelClass}>Uso pedagógico</label>
+                <label htmlFor="obra-uso" className={labelClass}>
+                  Uso pedagógico
+                </label>
                 <textarea
+                  id="obra-uso"
                   value={pedagogicalUse}
                   onChange={(e) => setPedagogicalUse(e.target.value)}
-                  placeholder="Descreva como usar esta obra em sala de aula..."
+                  placeholder="Ex: Abrir a aula com a cena do silêncio e pedir que a turma nomeie o que sentiu."
                   className="h-[100px] w-full resize-none rounded-[10px] border border-[rgba(170,147,249,0.34)] bg-[rgba(29,17,48,0.42)] px-3 py-2 text-sm text-cine-50 outline-none placeholder:text-cine-300 focus:border-cine-yellow"
                 />
               </div>
 
               <div>
-                <label className={labelClass}>Pergunta disparadora</label>
+                <label htmlFor="obra-pergunta" className={labelClass}>
+                  Pergunta disparadora
+                </label>
                 <textarea
+                  id="obra-pergunta"
                   value={triggerQuestion}
                   onChange={(e) => setTriggerQuestion(e.target.value)}
                   placeholder="Que pergunta ajuda os alunos a se conectar com a obra?"
@@ -364,27 +441,32 @@ export function WorkForm({ initial }: WorkFormProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className={labelClass}>Etapa sugerida</label>
+                  <label id="obra-etapa-label" className={labelClass}>
+                    Etapa sugerida
+                  </label>
                   <Select
                     value={stage}
                     onValueChange={(v) => setStage(v ?? "")}
                   >
-                    <SelectTrigger className={selectClass}>
+                    <SelectTrigger aria-labelledby="obra-etapa-label" className={selectClass}>
                       <SelectValue placeholder="Selecione uma etapa" />
                     </SelectTrigger>
                     <SelectContent>
-                      {Object.entries(stageLabels).map(([value, label]) => (
-                        <SelectItem key={value} value={value}>
-                          {label}
+                      {STAGE_OPTIONS.map((option) => (
+                        <SelectItem key={option} value={option}>
+                          {option}
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
-                  <label className={labelClass}>Habilidades BNCC</label>
+                  <label htmlFor="obra-bncc" className={labelClass}>
+                    Habilidades BNCC
+                  </label>
                   <div className="mt-1.5">
                     <BnccSkillsSelector
+                      inputId="obra-bncc"
                       selected={bnccSkills}
                       onAdd={addBnccSkill}
                       onRemove={removeBnccSkill}
@@ -394,9 +476,12 @@ export function WorkForm({ initial }: WorkFormProps) {
               </div>
 
               <div>
-                <label className={labelClass}>Temas</label>
+                <label htmlFor="obra-temas" className={labelClass}>
+                  Temas
+                </label>
                 <div className="mt-1.5">
                   <TagInput
+                    inputId="obra-temas"
                     tags={themes}
                     onAdd={addTheme}
                     onRemove={removeTheme}
@@ -430,9 +515,17 @@ export function WorkForm({ initial }: WorkFormProps) {
 
       {/* Action buttons */}
       {error && (
-        <div className="whitespace-pre-wrap rounded-[10px] border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+        <div
+          ref={errorRef}
+          role="alert"
+          className="whitespace-pre-wrap rounded-[10px] border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive"
+        >
           {error}
         </div>
+      )}
+
+      {missingRequired && !error && (
+        <p className="text-right text-xs text-cine-300">{incompleteHint}</p>
       )}
 
       <div className="flex items-center justify-end gap-3">
@@ -444,9 +537,9 @@ export function WorkForm({ initial }: WorkFormProps) {
           Descartar
         </button>
         <button
-          type="button"
-          onClick={() => handleSubmit("draft")}
-          disabled={submitting}
+          type="submit"
+          disabled={submitting || missingRequired}
+          title={missingRequired ? incompleteHint : undefined}
           className="inline-flex h-[42px] items-center rounded-full border border-[rgba(248,245,239,0.22)] px-5 text-sm font-[650] text-cine-50 transition-colors hover:bg-cine-50/10 disabled:opacity-50"
         >
           {submitting ? "Salvando..." : "Salvar rascunho"}
@@ -454,12 +547,13 @@ export function WorkForm({ initial }: WorkFormProps) {
         <button
           type="button"
           onClick={() => handleSubmit("published")}
-          disabled={submitting}
+          disabled={submitting || missingRequired}
+          title={missingRequired ? incompleteHint : undefined}
           className="inline-flex h-[42px] items-center rounded-full bg-cine-yellow px-5 text-sm font-[650] text-cine-text-dark transition-colors hover:bg-cine-yellow-dark disabled:opacity-50"
         >
           {submitting ? "Publicando..." : "Enviar para publicação"}
         </button>
       </div>
-    </div>
+    </form>
   );
 }

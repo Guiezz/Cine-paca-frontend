@@ -13,9 +13,10 @@ interface TagInputProps {
   onAdd: (name: string) => void;
   onRemove: (id: string) => void;
   placeholder?: string;
+  inputId?: string;
 }
 
-export function TagInput({ tags, onAdd, onRemove, placeholder }: TagInputProps) {
+export function TagInput({ tags, onAdd, onRemove, placeholder, inputId }: TagInputProps) {
   const [value, setValue] = useState("");
 
   function handleAdd() {
@@ -53,6 +54,7 @@ export function TagInput({ tags, onAdd, onRemove, placeholder }: TagInputProps) 
       </div>
       <div className="flex gap-2">
         <input
+          id={inputId}
           value={value}
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}

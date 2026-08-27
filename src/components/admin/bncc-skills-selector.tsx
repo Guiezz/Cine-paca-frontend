@@ -9,9 +9,10 @@ interface BnccSkillsSelectorProps {
   selected: BnccSkillEntity[];
   onAdd: (skill: BnccSkillEntity) => void;
   onRemove: (id: string) => void;
+  inputId?: string;
 }
 
-export function BnccSkillsSelector({ selected, onAdd, onRemove }: BnccSkillsSelectorProps) {
+export function BnccSkillsSelector({ selected, onAdd, onRemove, inputId }: BnccSkillsSelectorProps) {
   const [skills, setSkills] = useState<BnccSkillEntity[]>([]);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
@@ -67,6 +68,11 @@ export function BnccSkillsSelector({ selected, onAdd, onRemove }: BnccSkillsSele
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-cine-300" />
           <input
             ref={inputRef}
+            id={inputId}
+            // Dentro de um <form>, Enter aqui submeteria a obra inteira.
+            onKeyDown={(e) => {
+              if (e.key === "Enter") e.preventDefault();
+            }}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
