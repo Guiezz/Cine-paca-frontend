@@ -11,7 +11,7 @@ import type {
 } from "@/types/api";
 import { STAGE_OPTIONS } from "@/lib/stages";
 import { RATING_LABELS, STAGE_LABELS, WORK_TYPE_LABELS } from "@/lib/labels";
-import { TagInput } from "@/components/admin/tag-input";
+import { ThemeSelector, type SelectedTheme } from "@/components/admin/theme-selector";
 import { EditorialChecklist } from "@/components/admin/editorial-checklist";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { BnccSkillsSelector } from "@/components/admin/bncc-skills-selector";
@@ -70,13 +70,10 @@ export function WorkForm({ initial }: WorkFormProps) {
   const [themes, setThemes] = useState<{ id: string; name: string }[]>(
     initial?.themes?.map((t) => ({ id: t.id, name: t.name })) ?? [],
   );
-  const [nextThemeId, setNextThemeId] = useState(1);
-
   const [checklist, setChecklist] = useState<Record<string, boolean>>({});
 
-  function addTheme(name: string) {
-    setThemes((prev) => [...prev, { id: `new-${nextThemeId}`, name }]);
-    setNextThemeId((n) => n + 1);
+  function addTheme(theme: SelectedTheme) {
+    setThemes((prev) => [...prev, theme]);
   }
 
   function removeTheme(id: string) {
@@ -478,6 +475,7 @@ export function WorkForm({ initial }: WorkFormProps) {
                   <div className="mt-1.5">
                     <BnccSkillsSelector
                       inputId="obra-bncc"
+                      stage={stage}
                       selected={bnccSkills}
                       onAdd={addBnccSkill}
                       onRemove={removeBnccSkill}
@@ -491,17 +489,17 @@ export function WorkForm({ initial }: WorkFormProps) {
                   Temas
                 </label>
                 <div className="mt-1.5">
-                  <TagInput
+                  <ThemeSelector
                     inputId="obra-temas"
-                    tags={themes}
+                    selected={themes}
                     onAdd={addTheme}
                     onRemove={removeTheme}
-                    placeholder="Digite um tema..."
                   />
                 </div>
                 <p className="mt-2 text-xs leading-[16.8px] text-cine-300">
-                  Adicione quantos temas forem necessários. Ex: Emoções, Cultura
-                  brasileira, Infância, Leitura de imagem, Natureza etc.
+                  Reaproveite um tema já cadastrado sempre que possível — criar um
+                  parecido só duplica a taxonomia. Ex: Emoções, Cultura brasileira,
+                  Infância, Leitura de imagem, Natureza.
                 </p>
               </div>
             </div>

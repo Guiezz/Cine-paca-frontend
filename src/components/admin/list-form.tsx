@@ -6,7 +6,7 @@ import { clientApi } from "@/lib/api-client";
 import type { ListEntity, ThemeEntity, WorkEntity } from "@/types/api";
 import { STAGE_OPTIONS } from "@/lib/stages";
 import { STAGE_LABELS } from "@/lib/labels";
-import { TagInput } from "@/components/admin/tag-input";
+import { ThemeSelector, type SelectedTheme } from "@/components/admin/theme-selector";
 import { ImageUpload } from "@/components/admin/image-upload";
 import { WorkSearch } from "@/components/admin/work-search";
 import { OrderedList } from "@/components/admin/ordered-list";
@@ -58,13 +58,10 @@ export function ListForm({ initial }: ListFormProps) {
   const [themes, setThemes] = useState<{ id: string; name: string }[]>(
     initial?.themes?.map((t) => ({ id: t.id, name: t.name })) ?? [],
   );
-  const [nextThemeId, setNextThemeId] = useState(1);
-
   const addedIds = new Set(orderedItems.map((i) => i.work.id));
 
-  function addTheme(name: string) {
-    setThemes((prev) => [...prev, { id: `new-${nextThemeId}`, name }]);
-    setNextThemeId((n) => n + 1);
+  function addTheme(theme: SelectedTheme) {
+    setThemes((prev) => [...prev, theme]);
   }
 
   function removeTheme(id: string) {
@@ -370,12 +367,11 @@ export function ListForm({ initial }: ListFormProps) {
                 Temas principais
               </label>
               <div className="mt-1.5">
-                <TagInput
+                <ThemeSelector
                   inputId="lista-temas"
-                  tags={themes}
+                  selected={themes}
                   onAdd={addTheme}
                   onRemove={removeTheme}
-                  placeholder="Digite um tema..."
                 />
               </div>
             </div>
