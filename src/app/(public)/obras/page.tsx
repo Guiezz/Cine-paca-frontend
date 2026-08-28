@@ -41,6 +41,19 @@ export default async function SearchPage({ searchParams }: Props) {
   const result = await worksService.listPublic(apiParams);
   const hasActiveFilters = !!(q || stage || type);
 
+  const works = result.ok ? result.data.data : [];
+
+  // A seção "obras para continuar a curadoria" trazia três caixas "Em breve"
+  // fixas no código: prometia sugestões e não buscava nada. Agora só aparece
+  // se houver obra de verdade para sugerir.
+  const suggestions =
+    works.length === 0
+      ? await worksService
+          .listPublic({ per_page: 3 })
+          .then((res) => (res.ok ? res.data.data : []))
+          .catch(() => [])
+      : [];
+
   const buildActiveFilters = () => {
     const filters: { label: string; param: string; value: string }[] = [];
     if (stage) filters.push({ label: "Etapa", param: "stage", value: stage });
@@ -206,6 +219,7 @@ export default async function SearchPage({ searchParams }: Props) {
               </div>
 
               {/* Suggestions */}
+              {suggestions.length > 0 && (
               <div className="flex flex-col gap-4 rounded-[18px] border border-cine-border bg-cine-card-alt p-6">
                 <div className="flex flex-col md:flex-row items-start md:items-end justify-between gap-3 md:gap-0">
                   <div>
@@ -224,26 +238,13 @@ export default async function SearchPage({ searchParams }: Props) {
                   </p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3.5">
-                  {Array.from({ length: 3 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="flex flex-col overflow-hidden rounded-2xl border border-cine-border bg-cine-800/40"
-                    >
-                      <div className="relative aspect-video w-full overflow-hidden bg-cine-800">
-                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cine-700 to-cine-950 p-4">
-                          <span className="text-sm text-cine-200">Em breve</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col gap-2 p-4">
-                        <h3 className="font-heading text-lg font-bold leading-snug text-cine-50">
-                          Em breve
-                        </h3>
-                      </div>
-                    </div>
+                <div className="grid grid-cols-1 gap-3.5 md:grid-cols-3">
+                  {suggestions.map((work) => (
+                    <ObraCard key={work.id} work={work} variant="compact" />
                   ))}
                 </div>
               </div>
+              )}
             </>
           )}
         </div>

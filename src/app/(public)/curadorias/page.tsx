@@ -55,7 +55,7 @@ export default async function CuradoriasPage({ searchParams }: Props) {
         </div>
 
         <h1 className="font-heading text-3xl md:text-5xl lg:text-[68px] font-bold leading-[1.02] tracking-tight text-cine-50 max-w-[760px]">
-          Listas curatoriais para planejas com cinema brasileiro.
+          Listas curatoriais para planejar com cinema brasileiro.
         </h1>
 
         <p className="max-w-[670px] text-lg leading-relaxed text-cine-200">

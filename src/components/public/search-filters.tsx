@@ -51,17 +51,19 @@ export function SearchFilters() {
   );
 
   return (
-    <aside className="flex flex-col self-start rounded-[18px] border border-cine-border bg-cine-card-alt p-5 w-full md:w-[270px]">
-      <h2 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
-        Refinar por aula
-      </h2>
-      <p className="pt-2 text-sm leading-relaxed text-cine-200">
-        Use os critérios pedagógicos para encontrar obras adequadas ao planejamento.
-      </p>
+    <aside className="flex w-full flex-col gap-5 self-start rounded-[18px] border border-cine-border bg-cine-card-alt p-6 lg:w-[292px]">
+      <div className="flex flex-col gap-2">
+        <h2 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
+          Refinar por aula
+        </h2>
+        <p className="text-sm leading-relaxed text-cine-200">
+          Use os critérios pedagógicos para encontrar obras adequadas ao planejamento.
+        </p>
+      </div>
 
       {filterGroups.map((group) => (
-        <fieldset key={group.param} className="flex flex-col gap-2 pt-5">
-          <legend className="flex items-center gap-2.5 w-full pb-1">
+        <fieldset key={group.param} className="flex flex-col gap-2.5">
+          <legend className="flex w-full items-center gap-2.5 pb-1">
             <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-cine-yellow-light">
               {group.label}
             </span>
@@ -73,13 +75,22 @@ export function SearchFilters() {
             return (
               <label
                 key={option.value}
-                className="flex cursor-pointer items-center gap-3 text-sm text-cine-200"
+                className="flex cursor-pointer items-center gap-3 text-sm text-cine-200 transition-colors hover:text-cine-50"
               >
-                <div
-                  onClick={() => updateParam(group.param, option.value, !isActive)}
+                <input
+                  type="checkbox"
+                  checked={isActive}
+                  onChange={() => updateParam(group.param, option.value, !isActive)}
+                  className="peer sr-only"
+                />
+                <span
+                  aria-hidden="true"
                   className={cn(
-                    "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[2.5px] transition-colors",
-                    isActive ? "bg-cine-yellow" : "border border-[#767676] bg-white",
+                    "flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-[3px] transition-colors",
+                    "peer-focus-visible:ring-2 peer-focus-visible:ring-cine-yellow peer-focus-visible:ring-offset-2 peer-focus-visible:ring-offset-cine-card-alt",
+                    isActive
+                      ? "bg-cine-yellow"
+                      : "border border-cine-300/60 bg-cine-900/60",
                   )}
                 >
                   {isActive && (
@@ -99,7 +110,7 @@ export function SearchFilters() {
                       />
                     </svg>
                   )}
-                </div>
+                </span>
                 {option.label}
               </label>
             );
@@ -108,11 +119,11 @@ export function SearchFilters() {
       ))}
 
       {/* Empty state tip */}
-      <div className="mt-6 rounded-2xl border border-cine-300/40 bg-cine-800/40 p-5">
+      <div className="rounded-2xl border border-cine-300/40 bg-cine-800/40 p-4">
         <h3 className="font-heading text-base font-bold text-cine-50">
           Experimente buscar por tema
         </h3>
-        <p className="mt-1 text-xs leading-relaxed text-cine-200">
+        <p className="mt-1.5 text-xs leading-relaxed text-cine-200">
           Termos como infância, território, memória, natureza ou animação tendem a
           encontrar mais obras do acervo.
         </p>

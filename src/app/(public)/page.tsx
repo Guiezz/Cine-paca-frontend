@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { worksService } from "@/lib/services";
 import { ObraCard } from "@/components/public/obra-card";
 import type { Metadata } from "next";
@@ -14,6 +15,17 @@ export default async function HomePage() {
 
   const featured = works[0];
   const secondary = works.slice(1);
+
+  // A grade acompanha quantas obras existem, para não abrir coluna que ficaria
+  // vazia. Antes era fixa em 3x2 e o buraco virava caixa "Em breve".
+  const gridClass =
+    secondary.length === 0
+      ? "grid-cols-1"
+      : secondary.length === 1
+        ? "grid-cols-1 md:grid-cols-[1.18fr_1fr]"
+        : secondary.length === 2
+          ? "grid-cols-1 md:grid-cols-[1.18fr_1fr_1fr]"
+          : "grid-cols-1 md:grid-cols-[1.18fr_1fr_1fr] md:grid-rows-2";
 
   return (
     <div className="flex flex-col items-center gap-6 w-full max-w-[1140px] mx-auto pb-14">
@@ -132,32 +144,27 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-[1.18fr_1fr_1fr] md:grid-rows-2 gap-4">
-            {featured ? (
+          {featured ? (
+            <div className={cn("grid gap-4", gridClass)}>
               <ObraCard
                 work={featured}
                 variant="featured"
-                className="md:col-span-1 md:row-span-2"
+                className={cn(secondary.length > 2 && "md:row-span-2")}
               />
-            ) : (
-              <div className="md:col-span-1 md:row-span-2 flex items-center justify-center rounded-2xl border border-cine-border bg-cine-card p-8 text-cine-200">
-                Em breve
-              </div>
-            )}
-
-            {secondary.length > 0
-              ? secondary.map((work) => (
-                  <ObraCard key={work.id} work={work} variant="compact" />
-                ))
-              : Array.from({ length: 3 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="flex items-center justify-center rounded-2xl border border-cine-border bg-cine-card p-8 text-cine-200"
-                  >
-                    Em breve
-                  </div>
-                ))}
-          </div>
+              {secondary.map((work) => (
+                <ObraCard key={work.id} work={work} variant="compact" />
+              ))}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2 rounded-2xl border border-cine-border bg-cine-card px-6 py-14 text-center">
+              <p className="font-heading text-lg font-bold text-cine-50">
+                Nenhuma obra publicada ainda
+              </p>
+              <p className="max-w-[420px] text-sm leading-relaxed text-cine-200">
+                Assim que a curadoria publicar as primeiras obras, elas aparecem aqui.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Right Sidebar */}
