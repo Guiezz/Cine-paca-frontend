@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import { worksService } from "@/lib/services";
@@ -11,6 +12,54 @@ const typeLabels: Record<string, string> = {
   documentary: "Documentário",
   animation: "Animação",
 };
+
+
+/**
+ * Sem isto toda obra compartilhava o título e a descrição do site inteiro, e
+ * qualquer link colado no WhatsApp saía idêntico.
+ */
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const result = await worksService.getBySlug(slug);
+
+  if (!result.ok) {
+    return { title: "Obra não encontrada" };
+  }
+
+  const work = result.data;
+  // short_description é null para todas as obras da API; synopsis é o texto real.
+  const description = (work.short_description ?? work.synopsis ?? "").trim();
+  const ficha = [
+    typeLabels[work.type] ?? work.type,
+    work.release_year ? String(work.release_year) : null,
+    `${work.duration_minutes} min`,
+    work.stage,
+  ]
+    .filter(Boolean)
+    .join(" · ");
+
+  const resumo = description || `${ficha}. Obra do acervo do Cine Paca.`;
+  const image = work.hero_image_url ?? work.thumbnail_image_url ?? undefined;
+
+  return {
+    title: work.title,
+    description: resumo.slice(0, 300),
+    alternates: { canonical: `/obras/${work.slug}` },
+    openGraph: {
+      type: "video.other",
+      title: work.title,
+      description: resumo.slice(0, 300),
+      url: `/obras/${work.slug}`,
+      ...(image ? { images: [{ url: image, alt: work.title }] } : {}),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: work.title,
+      description: resumo.slice(0, 200),
+      ...(image ? { images: [image] } : {}),
+    },
+  };
+}
 
 export default async function WorkDetailPage({ params }: Props) {
   const { slug } = await params;

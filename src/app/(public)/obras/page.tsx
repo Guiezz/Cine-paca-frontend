@@ -5,6 +5,20 @@ import { SearchFilters } from "@/components/public/search-filters";
 import { ObraCard } from "@/components/public/obra-card";
 import { SearchActiveFilters } from "./search-active-filters";
 import { SearchSort } from "./search-sort";
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Acervo de obras",
+  description:
+    "Busque curtas, documentários e animações por tema, etapa de ensino e classificação indicativa, com sinopse e leitura pedagógica de cada obra.",
+  alternates: { canonical: "/obras" },
+  openGraph: {
+    title: "Acervo de obras",
+    description:
+      "Busque curtas, documentários e animações por tema, etapa de ensino e classificação indicativa.",
+    url: "/obras",
+  },
+};
 
 interface Props {
   searchParams: Promise<{ q?: string; stage?: string; type?: string; page?: string; sort?: string }>;
