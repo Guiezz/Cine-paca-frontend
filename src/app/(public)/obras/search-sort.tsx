@@ -1,7 +1,22 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { ChangeEvent } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
+/**
+ * Rótulos precisam ir como `items`: o <SelectValue> do Base UI só mapeia
+ * valor para rótulo com essa tabela, senão mostra o valor cru.
+ */
+const SORT_LABELS: Record<string, string> = {
+  relevance: "Ordenar por relevância",
+  title: "Ordenar por título",
+};
 
 export function SearchSort() {
   const router = useRouter();
@@ -10,9 +25,9 @@ export function SearchSort() {
 
   const currentSort = searchParams.get("sort") || "relevance";
 
-  const handleSortChange = (e: ChangeEvent<HTMLSelectElement>) => {
+  function handleSortChange(value: string | null) {
     const params = new URLSearchParams(searchParams.toString());
-    const newSort = e.target.value;
+    const newSort = value ?? "relevance";
 
     if (newSort === "relevance") {
       params.delete("sort");
@@ -21,22 +36,24 @@ export function SearchSort() {
     }
 
     params.set("page", "1");
-
     router.push(`${pathname}?${params.toString()}`);
-  };
+  }
 
   return (
-    <div className="flex min-h-[40px] items-center rounded-full border border-cine-border bg-[rgba(42,26,69,0.66)] px-3.5 text-sm font-[560] text-cine-200">
-      <select 
-        className="bg-transparent outline-none cursor-pointer"
-        value={currentSort}
-        onChange={handleSortChange}
+    <Select items={SORT_LABELS} value={currentSort} onValueChange={handleSortChange}>
+      <SelectTrigger
+        aria-label="Ordenar resultados"
+        className="min-h-[40px] w-full rounded-full border border-cine-border bg-[rgba(42,26,69,0.66)] px-3.5 text-sm font-[560] text-cine-200 outline-none transition-colors focus-visible:border-cine-yellow focus-visible:ring-2 focus-visible:ring-cine-yellow/25 sm:w-auto"
       >
-        <option value="relevance">Ordenar por relevância</option>
-        <option value="title">Ordenar por título</option>
-        {/* <option value="newest">Mais recentes</option>
-        <option value="oldest">Mais antigos</option> */}
-      </select>
-    </div>
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {Object.entries(SORT_LABELS).map(([value, label]) => (
+          <SelectItem key={value} value={value}>
+            {label}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
 }

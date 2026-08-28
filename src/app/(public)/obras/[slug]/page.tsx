@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { worksService } from "@/lib/services";
 
 interface Props {
@@ -71,6 +72,16 @@ export default async function WorkDetailPage({ params }: Props) {
   }
 
   const work = result.data;
+
+  // Antes esta seção eram três caixas "Em breve" fixas no código: prometia
+  // obras relacionadas e nunca buscava nenhuma.
+  const relatedResult = await worksService.listPublic({
+    per_page: 4,
+    ...(work.stage ? { stage: work.stage } : {}),
+  });
+  const related = (relatedResult.ok ? relatedResult.data.data : [])
+    .filter((item) => item.id !== work.id)
+    .slice(0, 3);
 
   const metadata = [
     { label: "TÍTULO", value: work.title },
@@ -304,33 +315,46 @@ export default async function WorkDetailPage({ params }: Props) {
           </div>
 
           {/* Obras Relacionadas */}
-          <div className="flex flex-col gap-3.5 rounded-[18px] border border-cine-border bg-cine-card-alt p-4 md:p-6">
-            <h2 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
-              Obras relacionadas
-            </h2>
-            <div className="flex flex-col gap-3">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="flex items-start gap-3 rounded-2xl border border-cine-border/60 bg-cine-800/35 p-2.5"
-                >
-                  <div className="aspect-[23/15] w-[92px] shrink-0 overflow-hidden rounded-lg bg-cine-800">
-                    <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cine-700 to-cine-950">
-                      <span className="text-[10px] text-cine-200">Frame</span>
+          {related.length > 0 && (
+            <div className="flex flex-col gap-3.5 rounded-[18px] border border-cine-border bg-cine-card-alt p-4 md:p-6">
+              <h2 className="font-heading text-[22px] font-bold leading-tight tracking-tight text-cine-50">
+                Obras relacionadas
+              </h2>
+              <div className="flex flex-col gap-3">
+                {related.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={`/obras/${item.slug}`}
+                    className="flex items-start gap-3 rounded-2xl border border-cine-border/60 bg-cine-800/35 p-2.5 transition-colors hover:border-cine-yellow/40"
+                  >
+                    <div className="aspect-[23/15] w-[92px] shrink-0 overflow-hidden rounded-lg bg-cine-800">
+                      {item.thumbnail_image_url ? (
+                        <Image
+                          src={item.thumbnail_image_url}
+                          alt=""
+                          width={92}
+                          height={60}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-cine-700 to-cine-950">
+                          <span className="text-[10px] text-cine-200">Frame</span>
+                        </div>
+                      )}
                     </div>
-                  </div>
-                  <div className="flex min-w-0 flex-col gap-1">
-                    <h3 className="truncate font-heading text-sm font-bold leading-snug tracking-tight text-cine-50">
-                      Em breve
-                    </h3>
-                    <p className="text-xs leading-relaxed text-cine-200">
-                      Mais obras em destaque em breve.
-                    </p>
-                  </div>
-                </div>
-              ))}
+                    <div className="flex min-w-0 flex-col gap-1">
+                      <h3 className="truncate font-heading text-sm font-bold leading-snug tracking-tight text-cine-50">
+                        {item.title}
+                      </h3>
+                      <p className="text-xs leading-relaxed text-cine-200">
+                        {typeLabels[item.type] ?? item.type} · {item.duration_minutes} min
+                      </p>
+                    </div>
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
         </div>
       </section>
     </div>
