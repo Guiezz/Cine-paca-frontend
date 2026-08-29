@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type KeyboardEvent } from "react";
+import { Tooltip } from "@base-ui/react/tooltip";
 import { clientApi } from "@/lib/api-client";
 import type { BnccSkillEntity } from "@/types/api";
 import { X, Search } from "lucide-react";
@@ -47,6 +48,11 @@ export function BnccSkillsSelector({
   const inputRef = useRef<HTMLInputElement>(null);
   const selectedIds = new Set(selected.map((s) => s.id));
   const listboxId = `${inputId ?? "bncc"}-listbox`;
+  const optionId = (skillId: string) => `${listboxId}-option-${skillId}`;
+
+  // Um único popup para a lista inteira: as opções são triggers avulsas
+  // ligadas a ele pelo handle, e a habilidade viaja como payload.
+  const [descriptionTooltip] = useState(() => Tooltip.createHandle<BnccSkillEntity>());
 
   // A API limita per_page a 50, então a busca precisa ir ao servidor: filtrar
   // no cliente deixaria de fora qualquer habilidade além das 50 primeiras.
@@ -93,10 +99,29 @@ export function BnccSkillsSelector({
       return aMatch - bMatch;
     });
 
+  // A tooltip é ancorada em uma opção; quando a lista fecha, a âncora some.
+  useEffect(() => {
+    if (!open) descriptionTooltip.close();
+  }, [open, descriptionTooltip]);
+
+  /**
+   * Navegando pelo teclado o foco fica no input, e não na opção, então o
+   * hover do Base UI nunca dispara: a tooltip da opção destacada precisa ser
+   * aberta na mão. Aqui e não em um efeito porque com um resultado só o
+   * índice não muda entre as setas, e o efeito não voltaria a rodar.
+   */
+  function moveHighlight(delta: number) {
+    if (filtered.length === 0) return;
+    const next = (highlight + delta + filtered.length) % filtered.length;
+    setHighlight(next);
+    if (open) descriptionTooltip.open(optionId(filtered[next].id));
+  }
+
   function choose(index: number) {
     const skill = filtered[index];
     if (!skill) return;
     onAdd(skill);
+    descriptionTooltip.close();
     setQuery("");
     setHighlight(0);
     inputRef.current?.focus();
@@ -111,12 +136,12 @@ export function BnccSkillsSelector({
     if (e.key === "ArrowDown") {
       e.preventDefault();
       setOpen(true);
-      setHighlight((h) => (filtered.length === 0 ? 0 : (h + 1) % filtered.length));
+      moveHighlight(1);
       return;
     }
     if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlight((h) => (filtered.length === 0 ? 0 : (h - 1 + filtered.length) % filtered.length));
+      moveHighlight(-1);
       return;
     }
     if (e.key === "Escape") {
@@ -158,6 +183,9 @@ export function BnccSkillsSelector({
             onChange={(e) => {
               setQuery(e.target.value);
               setOpen(true);
+              // A busca troca a lista inteira: a opção que ancorava a tooltip
+              // some, e sem isso ela fica na tela mostrando outra habilidade.
+              descriptionTooltip.close();
               setHighlight(0);
             }}
             onFocus={() => setOpen(true)}
@@ -195,8 +223,15 @@ export function BnccSkillsSelector({
               </p>
             ) : (
               filtered.map((skill, index) => (
-                <button
+                // A descrição fica truncada em uma linha na lista; a tooltip é
+                // o único lugar onde a habilidade aparece por inteiro, e há
+                // habilidades da BNCC com mais de mil caracteres.
+                <Tooltip.Trigger
                   key={skill.id}
+                  id={optionId(skill.id)}
+                  handle={descriptionTooltip}
+                  payload={skill}
+                  delay={300}
                   type="button"
                   role="option"
                   aria-selected={index === highlight}
@@ -218,12 +253,37 @@ export function BnccSkillsSelector({
                       )}
                     </p>
                   </div>
-                </button>
+                </Tooltip.Trigger>
               ))
             )}
           </div>
         )}
       </div>
+
+      {/* Ao lado da lista, não por cima: o que a pessoa quer é comparar a
+          descrição inteira com as outras opções ainda visíveis. Em tela
+          estreita o Base UI vira sozinho para o lado que couber. */}
+      <Tooltip.Root handle={descriptionTooltip}>
+        {({ payload: skill }) =>
+          skill ? (
+            <Tooltip.Portal>
+              <Tooltip.Positioner side="right" align="start" sideOffset={10} collisionPadding={12}>
+                <Tooltip.Popup className="z-[60] max-h-[min(360px,60vh)] w-[min(420px,calc(100vw-2rem))] overflow-y-auto rounded-[10px] border border-[rgba(80,64,107,0.74)] bg-[#201337] p-3 shadow-lg">
+                  <p className="mb-1 flex flex-wrap items-baseline gap-x-2">
+                    <span className="font-mono text-[11px] text-cine-yellow-light">
+                      {skill.code}
+                    </span>
+                    <span className="text-[11px] text-cine-300">
+                      {skill.area} · {skill.stage}
+                    </span>
+                  </p>
+                  <p className="text-sm leading-relaxed text-cine-50">{skill.description}</p>
+                </Tooltip.Popup>
+              </Tooltip.Positioner>
+            </Tooltip.Portal>
+          ) : null
+        }
+      </Tooltip.Root>
     </div>
   );
 }
