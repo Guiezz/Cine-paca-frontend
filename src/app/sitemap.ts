@@ -3,6 +3,13 @@ import { absoluteUrl } from "@/lib/site";
 import { listsService, worksService } from "@/lib/services";
 import type { ListEntity, WorkEntity } from "@/types/api";
 
+/**
+ * O sitemap também é uma rota prerenderizada: sem `revalidate` ele fica preso
+ * no acervo que existia no build e segue indexando obra já removida. Uma hora
+ * basta — cada revalidação varre a API paginando.
+ */
+export const revalidate = 3600;
+
 /** A API recusa per_page acima de 50. */
 const PER_PAGE = 50;
 /** Teto de segurança para o sitemap não virar um laço infinito de páginas. */
